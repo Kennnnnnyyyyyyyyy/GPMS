@@ -42,11 +42,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+    <div class="col-md-3">
             <div class="card bg-success text-white">
                 <div class="card-body">
-                    <h5>Available Rooms</h5>
-                    <h2 id="availableRoomsCount">-</h2>
+            <h5>Check Room Availability</h5>
+            <h2 id="availableRoomsCount" style="cursor:pointer;" onclick="showAvailability()">-</h2>
                 </div>
             </div>
         </div>
@@ -130,6 +130,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label for="meetingOrganizer">Organizer (who is scheduling) *</label>
+                                <input type="text" class="form-control" id="meetingOrganizer" placeholder="Your name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label for="meetingDate">Date *</label>
                                 <input type="date" class="form-control" id="meetingDate" required>
                             </div>
@@ -163,8 +171,8 @@
                             <option value="room3">Room 3</option>
                         </select>
                     </div>
-                    <div id="proposedSlots" class="mt-3" style="display: none;">
-                        <h6>Proposed Time Slots:</h6>
+                    <div id="proposedSlots" class="mt-3" style="display: none; transition: transform .3s ease;">
+                        <h6>Available Time Slots:</h6>
                         <div id="slotsList"></div>
                     </div>
                 </form>
@@ -259,5 +267,20 @@
             margin: 2px 0;
             font-size: 0.8em;
         }
+        /* Subtle highlight for current day cell only */
+        .calendar-day.today {
+            background: rgba(0, 123, 255, 0.08);
+        }
+        .slot-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    /* Per-office calendar themes for quick visual separation */
+    #calendar.office-mumbai .calendar-day.today { background: rgba(255, 193, 7, 0.15); }
+    #calendar.office-chennai .calendar-day.today { background: rgba(220, 53, 69, 0.12); }
+    #calendar.office-ahmedabad .calendar-day.today { background: rgba(40, 167, 69, 0.12); }
+    #calendar.office-mumbai .badge.bg-secondary { background-color: #ffc107 !important; color: #212529; }
+    #calendar.office-chennai .badge.bg-secondary { background-color: #dc3545 !important; }
+    #calendar.office-ahmedabad .badge.bg-secondary { background-color: #28a745 !important; }
     </style>
 }

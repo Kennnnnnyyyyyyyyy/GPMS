@@ -13,30 +13,27 @@
 <body>
     <!-- Top Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
+        <div class="container-fluid position-relative">
             <!-- Sidebar Toggle Button -->
             <button class="btn btn-outline-light me-3" type="button" id="sidebarToggle">
                 <i class="bi bi-list"></i>
             </button>
             
-            <!-- Page Title -->
+            <!-- Page Title (left) -->
             <span class="navbar-text text-white me-auto">
                 @ViewData["Title"]
             </span>
-            
-            <!-- Visitor ID Search -->
-            <div class="d-flex align-items-center me-3">
-                <div class="input-group" style="width: 250px;">
-                    <input type="text" class="form-control" placeholder="Enter Visitor ID" id="visitorIdInput">
-                    <button class="btn btn-success" type="button" id="visitorGoBtn">
-                        <i class="bi bi-search"></i> Go
-                    </button>
-                </div>
+
+            <!-- Center Clock & Date -->
+            <div class="position-absolute start-50 translate-middle-x d-flex align-items-center">
+                <span id="navbarClock" class="text-white fw-semibold me-2">--:--:--</span>
+                <span class="text-white">|</span>
+                <span id="navbarDate" class="text-white ms-2">-- Month, ----</span>
             </div>
             
             <!-- User Info & Logout - Moved to extreme right -->
             <div class="navbar-nav ms-auto">
-                @if (User.Identity.IsAuthenticated)
+                @if (User?.Identity?.IsAuthenticated == true)
                 {
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
@@ -81,7 +78,7 @@
 
         <div class="sidebar-content">
             <ul class="nav flex-column">
-                @if (User.IsInRole("Admin"))
+                @if (User?.IsInRole("Admin") == true)
                 {
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Room" ? "active" : "")" 
@@ -116,7 +113,7 @@
                     </li>
                 }
                 
-                @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+                @if ((User?.IsInRole("Admin") == true) || (User?.IsInRole("Reception") == true))
                 {
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "GatePass" ? "active" : "")" 
@@ -151,7 +148,7 @@
                                 </a>
                             </li>
                             
-                            @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+                            @if ((User?.IsInRole("Admin") == true) || (User?.IsInRole("Reception") == true))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "VisitorApproval" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" 
@@ -178,7 +175,7 @@
                                 </li>
                             }
                             
-                            @if (User.IsInRole("Admin") || User.IsInRole("Reception") || User.IsInRole("SecurityGuard"))
+                            @if ((User?.IsInRole("Admin") == true) || (User?.IsInRole("Reception") == true) || (User?.IsInRole("SecurityGuard") == true))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "GateScan" ? "active" : "")" 
@@ -243,25 +240,28 @@
                 }
             });
 
-            // Handle visitor ID search
-            const visitorGoBtn = document.getElementById('visitorGoBtn');
-            const visitorIdInput = document.getElementById('visitorIdInput');
-            
-            if (visitorGoBtn && visitorIdInput) {
-                visitorGoBtn.addEventListener('click', function() {
-                    const visitorId = visitorIdInput.value.trim();
-                    if (visitorId) {
-                        // Implement visitor search functionality - now routes to approvals
-                        window.location.href = '/VisitorApproval/TodaysVisitors?search=' + encodeURIComponent(visitorId);
-                    }
-                });
+            // Live Clock & Date in navbar (center)
+            const clockEl = document.getElementById('navbarClock');
+            const dateEl = document.getElementById('navbarDate');
+            function updateClock() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                if (clockEl) clockEl.textContent = `${hh}:${mm}:${ss}`;
 
-                visitorIdInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        visitorGoBtn.click();
-                    }
-                });
+                const months = [
+                    'January','February','March','April','May','June',
+                    'July','August','September','October','November','December'
+                ];
+                const day = now.getDate(); // e.g., 22
+                const monthName = months[now.getMonth()];
+                const year = now.getFullYear();
+                // Format: 22 September, 2025
+                if (dateEl) dateEl.textContent = `${day} ${monthName}, ${year}`;
             }
+            updateClock();
+            setInterval(updateClock, 1000);
 
             // Rotate chevron icons on collapse
             const collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');

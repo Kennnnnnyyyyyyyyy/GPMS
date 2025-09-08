@@ -6,6 +6,7 @@ let rooms = [];
 let currentView = 'month';
 let connection = null;
 let currentUser = null;
+let currentHubOfficeId = null;
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -41,10 +42,10 @@ function setupSignalR() {
         updateConnectionStatus(true);
         console.log('Connected to scheduler hub');
         
-        // Join all office groups for notifications
-        offices.forEach(office => {
-            connection.invoke("JoinOfficeGroup", office.id);
-        });
+        // Join currently selected office group (if any)
+        if (selectedOfficeId) {
+            try { connection.invoke('JoinOfficeGroup', selectedOfficeId); currentHubOfficeId = selectedOfficeId; } catch (e) { }
+        }
     }).catch(function (err) {
         updateConnectionStatus(false);
         console.error('Failed to connect to scheduler hub:', err);
@@ -54,16 +55,19 @@ function setupSignalR() {
     connection.on("MeetingCreated", function (meeting) {
         showNotification(`New meeting scheduled: ${meeting.subject}`, 'success');
         refreshCurrentView();
+        updateStats();
     });
 
     connection.on("MeetingUpdated", function (meeting) {
         showNotification(`Meeting updated: ${meeting.subject}`, 'info');
         refreshCurrentView();
+        updateStats();
     });
 
     connection.on("MeetingCancelled", function (meetingId) {
         showNotification('Meeting has been cancelled', 'warning');
         refreshCurrentView();
+        updateStats();
     });
 
     // Handle connection events
@@ -160,9 +164,10 @@ async function loadOffices() {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        offices = await response.json();
+    offices = await response.json();
         renderOfficeCards();
         populateOfficeDropdown();
+    // No-op: will join a group when an office is selected
     } catch (error) {
         console.error('Failed to load offices:', error);
         showNotification('Failed to load offices', 'error');
@@ -178,15 +183,15 @@ function renderOfficeCards() {
         const card = document.createElement('div');
         card.className = 'col-md-4 mb-3';
         card.innerHTML = `
-            <div class="card office-card" onclick="selectOffice('${office.id}', '${office.name}')">
+            <div class="card office-card" data-office-id="${office.id}" onclick="selectOffice('${office.id}', '${office.name}')">
                 <div class="card-body text-center">
                     <h5 class="card-title">
                         <i class="fas fa-building"></i> ${office.name}
                     </h5>
                     <div class="office-stats">
-                        <div>Timezone: ${office.timeZoneId}</div>
-                        <div>Hours: ${office.businessStart} - ${office.businessEnd}</div>
-                        <div>Days: ${office.workDays}</div>
+                        <div>Timezone: ${office.timezone ?? office.timeZoneId ?? ''}</div>
+                        <div>Hours: ${office.workingHours ?? ((office.businessStart||'') + ' - ' + (office.businessEnd||''))}</div>
+                        <div>Days: ${office.workingDays ?? office.workDays ?? ''}</div>
                     </div>
                 </div>
             </div>
@@ -216,9 +221,21 @@ async function selectOffice(officeId, officeName) {
     document.querySelectorAll('.office-card').forEach(card => {
         card.classList.remove('selected');
     });
-    event.currentTarget.classList.add('selected');
+    const selectedCard = document.querySelector(`.office-card[data-office-id="${officeId}"]`);
+    if (selectedCard) selectedCard.classList.add('selected');
     
     document.getElementById('selectedOfficeName').textContent = officeName;
+    setCalendarTheme(officeName);
+
+    // Manage SignalR group subscriptions per office
+    try {
+        if (connection) {
+            if (currentHubOfficeId && currentHubOfficeId !== officeId) {
+                try { await connection.invoke('LeaveOfficeGroup', currentHubOfficeId); } catch (e) { }
+            }
+            try { await connection.invoke('JoinOfficeGroup', officeId); currentHubOfficeId = officeId; } catch (e) { }
+        }
+    } catch (e) { /* ignore */ }
     
     // Load rooms for this office
     await loadRooms(officeId);
@@ -232,17 +249,7 @@ async function selectOffice(officeId, officeName) {
 // Load rooms for selected office
 async function loadRooms(officeId) {
     try {
-        // Seed rooms if needed
-        await fetch('/api/v1/rooms/seed', { 
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': getAntiForgeryToken()
-            }
-        });
-
-        const response = await fetch(`/api/v1/rooms/by-office/${officeId}`, {
+    const response = await fetch(`/api/v1/offices/${officeId}/rooms`, {
             credentials: 'include'
         });
         
@@ -262,9 +269,6 @@ function populateRoomDropdown() {
     // Keep the default options and add API-loaded rooms
     const defaultOptions = `
         <option value="">Any available room</option>
-        <option value="room1">Room 1</option>
-        <option value="room2">Room 2</option>
-        <option value="room3">Room 3</option>
     `;
     
     select.innerHTML = defaultOptions;
@@ -293,12 +297,12 @@ async function loadCalendar() {
     `;
     
     try {
-        // Load meetings for the current month
-        const now = new Date();
-        const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    // Load meetings from now to end of current month (hide past events)
+    const now = new Date();
+    const startDate = new Date();
+        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
         
-        const response = await fetch(`/api/v1/meetings/calendar?fromUtc=${startDate.toISOString()}&toUtc=${endDate.toISOString()}&_t=${Date.now()}`, {
+    const response = await fetch(`/api/v1/meetings/calendar?fromUtc=${startDate.toISOString()}&toUtc=${endDate.toISOString()}&officeId=${encodeURIComponent(selectedOfficeId)}&_t=${Date.now()}`, {
             credentials: 'include',
             cache: 'no-cache'
         });
@@ -363,30 +367,46 @@ function renderCalendar(meetings) {
             if (week === 0 && day < firstDay) {
                 calendarHTML += '<div class="col calendar-day p-2" style="min-height: 100px;"></div>';
             } else if (dayCount <= daysInMonth) {
+                const nowTs = Date.now();
                 const dayMeetings = meetings.filter(m => {
-                    const meetingDate = new Date(m.startUtc);
-                    return meetingDate.getDate() === dayCount && 
-                           meetingDate.getMonth() === currentMonth &&
-                           meetingDate.getFullYear() === currentYear;
+                    const startDate = new Date(m.startUtc);
+                    const endDate = new Date(m.endUtc);
+                    return startDate.getDate() === dayCount && 
+                           startDate.getMonth() === currentMonth &&
+                           startDate.getFullYear() === currentYear &&
+                           endDate.getTime() > nowTs; // hide past-ended
                 });
-                
+
                 const isToday = dayCount === now.getDate() && currentMonth === now.getMonth() && currentYear === now.getFullYear();
-                const dayClass = isToday ? 'bg-light' : '';
-                
+                const flagHtml = isToday ? '<span class="badge bg-primary ms-1">Today</span>' : '';
+
                 calendarHTML += `
-                    <div class="col calendar-day p-2 border-right ${dayClass}" style="min-height: 100px;">
-                        <div class="day-number font-weight-bold">${dayCount}</div>
+                    <div class="col calendar-day p-2 border-right${isToday ? ' today' : ''}" style="min-height: 100px;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="day-number font-weight-bold">${dayCount}</div>
+                            ${flagHtml}
+                        </div>
                         <div class="day-meetings">
                 `;
                 
+                const count = dayMeetings.length;
+                if (count > 0) {
+                    calendarHTML += `<div class="badge bg-secondary mb-1" title="${count} meetings">${count} meeting${count>1?'s':''}</div>`;
+                }
                 dayMeetings.forEach(meeting => {
                     const startTime = new Date(meeting.startUtc).toLocaleTimeString('en-US', { 
                         hour: '2-digit', 
                         minute: '2-digit',
                         hour12: false 
                     });
+                    const endTime = new Date(meeting.endUtc).toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                    });
+                    const tooltip = `${startTime}-${endTime} | ${meeting.subject}`;
                     calendarHTML += `
-                        <div class="meeting-item" title="${meeting.subject}">
+                        <div class="meeting-item" title="${tooltip}">
                             ${startTime} ${meeting.subject.substring(0, 15)}${meeting.subject.length > 15 ? '...' : ''}
                         </div>
                     `;
@@ -411,11 +431,32 @@ function renderCalendar(meetings) {
 // Update statistics
 async function updateStats() {
     try {
-        // For now, use placeholder values
-        // In a real implementation, you'd call specific stats endpoints
-        document.getElementById('todayMeetingsCount').textContent = '0';
-        document.getElementById('availableRoomsCount').textContent = rooms.length || '0';
-        document.getElementById('weekMeetingsCount').textContent = '0';
+        // Today
+        const todayResp = await fetch(`/api/v1/meetings/stats/today?officeId=${selectedOfficeId??''}`, { credentials: 'include', cache: 'no-cache' });
+        if (todayResp.ok) {
+            const data = await todayResp.json();
+            document.getElementById('todayMeetingsCount').textContent = data.todayMeetings ?? '0';
+        }
+        // Week
+        const weekResp = await fetch(`/api/v1/meetings/stats/week?officeId=${selectedOfficeId??''}`, { credentials: 'include', cache: 'no-cache' });
+        if (weekResp.ok) {
+            const data = await weekResp.json();
+            document.getElementById('weekMeetingsCount').textContent = data.weekMeetings ?? '0';
+        }
+        // Rooms available = active rooms - overlapping meetings now
+        const now = new Date();
+        const availResp = await fetch(`/api/v1/meetings/availability?officeId=${selectedOfficeId??''}&date=${now.toISOString().slice(0,10)}`, { credentials: 'include', cache: 'no-cache' });
+        if (availResp.ok) {
+            const { availability } = await availResp.json();
+            const activeRooms = availability?.length ?? 0;
+            // booked now
+            const nowUtc = now.toISOString();
+            const bookedNow = availability?.filter(r => r.bookings.some(b => b.startUtc < nowUtc && b.endUtc > nowUtc)).length ?? 0;
+            const free = Math.max(activeRooms - bookedNow, 0);
+            document.getElementById('availableRoomsCount').textContent = String(free);
+        } else {
+            document.getElementById('availableRoomsCount').textContent = rooms.length || '0';
+        }
         document.getElementById('activeOfficesCount').textContent = offices.length || '0';
     } catch (error) {
         console.error('Failed to update stats:', error);
@@ -477,11 +518,11 @@ function closeModal() {
 // Propose available slots
 async function proposeSlots() {
     const subject = document.getElementById('meetingSubject').value;
-    const officeId = document.getElementById('meetingOffice').value;
+    const officeId = document.getElementById('meetingOffice').value || selectedOfficeId;
     const date = document.getElementById('meetingDate').value;
-    const duration = parseInt(document.getElementById('meetingDuration').value);
+    const duration = document.getElementById('meetingDuration').value; // as minutes string
     const roomId = document.getElementById('meetingRoom').value;
-    
+
     if (!subject || !officeId || !date || !duration) {
         showNotification('Please fill in all required fields', 'warning');
         return;
@@ -490,29 +531,36 @@ async function proposeSlots() {
     showLoading(true);
     
     try {
-        // Generate some sample time slots directly in JavaScript
-        const selectedDate = new Date(date);
-        const slots = [];
-        
-        // Generate time slots from 9 AM to 5 PM
-        for (let hour = 9; hour < 17; hour += 2) {
-            const startTime = new Date(selectedDate);
-            startTime.setHours(hour, 0, 0, 0);
-            
-            const endTime = new Date(startTime);
-            endTime.setHours(hour + 1, 0, 0, 0);
-            
-            slots.push({
-                startUtc: startTime.toISOString(),
-                endUtc: endTime.toISOString(),
-                available: true,
-                roomName: roomId || "Conference Room",
-                officeId: officeId,
-                roomId: roomId || "room-1"
-            });
-        }
-        
-        // Render the slots directly
+        const payload = {
+            officeId: officeId,
+            date: new Date(date).toISOString(),
+            duration: String(duration),
+            preferredRoom: roomId || '',
+            organizerId: (currentUser && currentUser.id) ? currentUser.id : ''
+        };
+        const resp = await fetch('/api/v1/meetings/propose', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getAntiForgeryToken() },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        });
+        if (!resp.ok) throw new Error('Failed to propose');
+        const data = await resp.json();
+        const slots = (data.slots || []).map(s => ({
+            startUtc: s.startUtc || s.start,
+            endUtc: s.endUtc || s.end,
+            available: s.available,
+            roomName: s.room || roomId || 'TBD',
+            officeId: officeId,
+            roomId: roomId || null
+        }));
+
+        // Slide transition
+        const panel = document.getElementById('proposedSlots');
+        panel.style.display = 'block';
+        panel.style.transform = 'translateX(100%)';
+        setTimeout(() => { panel.style.transform = 'translateX(0)'; }, 20);
+
         renderProposedSlots(slots);
         
     } catch (error) {
@@ -533,8 +581,8 @@ function renderProposedSlots(slots) {
     } else {
         slots.forEach((slot, index) => {
             const slotDiv = document.createElement('div');
-            slotDiv.className = 'slot-option';
-            slotDiv.onclick = () => selectSlot(index, slot);
+            slotDiv.className = 'slot-option' + (slot.available ? '' : ' disabled');
+            if (slot.available) slotDiv.onclick = () => selectSlot(index, slot);
             
             const startTime = new Date(slot.startUtc).toLocaleTimeString('en-US', { 
                 hour: '2-digit', 
@@ -546,7 +594,7 @@ function renderProposedSlots(slots) {
             });
             
             slotDiv.innerHTML = `
-                <strong>${startTime} - ${endTime}</strong><br>
+                <strong>${startTime} - ${endTime}</strong> ${slot.available ? '' : '<span class="badge bg-danger ms-2">Booked</span>'}<br>
                 <small class="text-muted">Room: ${slot.roomName || 'TBD'}</small>
             `;
             
@@ -599,10 +647,11 @@ async function confirmMeeting() {
             subject: document.getElementById('meetingSubject').value,
             description: document.getElementById('meetingDescription').value,
             organizerId: organizerId,
-            officeId: selectedSlot.officeId, // Use office ID from the selected slot to match the room
-            roomId: selectedSlot.roomId,
+            officeId: selectedOfficeId,
+            roomId: selectedSlot.roomId || null,
             start: selectedSlot.startUtc,
             end: selectedSlot.endUtc,
+            organizerName: document.getElementById('meetingOrganizer')?.value || (currentUser?.name ?? ''),
             participantIds: [] // We'll need to resolve emails to employee IDs in the backend
         };
         
@@ -677,18 +726,76 @@ function refreshCurrentView() {
     }
 }
 
-function changeView(view) {
+function changeView(view, evt) {
     currentView = view;
-    // Update button states
-    document.querySelectorAll('.btn-group button').forEach(btn => {
-        btn.classList.remove('btn-secondary');
-        btn.classList.add('btn-outline-secondary');
-    });
-    event.target.classList.remove('btn-outline-secondary');
-    event.target.classList.add('btn-secondary');
-    
+    // Update button states (guard against missing event/target)
+    try {
+        const buttons = document.querySelectorAll('.btn-group button');
+        if (buttons && buttons.length) {
+            buttons.forEach(btn => {
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-outline-secondary');
+            });
+        }
+        const target = (evt && evt.target) ? evt.target : (typeof event !== 'undefined' && event.target ? event.target : null);
+        if (target) {
+            target.classList.remove('btn-outline-secondary');
+            target.classList.add('btn-secondary');
+        }
+    } catch (_) { /* noop */ }
+
     // Refresh calendar with new view
     refreshCurrentView();
+}
+
+// Set per-office calendar theme (visual distinction only)
+function setCalendarTheme(officeName) {
+    const el = document.getElementById('calendar');
+    if (!el) return;
+    // Remove previous office-* classes
+    el.className = el.className
+        .split(' ')
+        .filter(c => !c.startsWith('office-'))
+        .join(' ');
+    const slug = (officeName || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if (slug) {
+        el.classList.add(`office-${slug}`);
+    }
+}
+
+// Open availability popup
+async function showAvailability() {
+        if (!selectedOfficeId) { showNotification('Select an office first', 'warning'); return; }
+        const today = new Date().toISOString().slice(0,10);
+        const resp = await fetch(`/api/v1/meetings/availability?officeId=${selectedOfficeId}&date=${today}`, { credentials: 'include' });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'block';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg"><div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Room Availability</h5>
+                    <button type="button" class="btn-close" onclick="this.closest('.modal').remove()"></button></div>
+                <div class="modal-body">
+                    ${data.availability.map(r => renderRoomAvailability(r)).join('')}
+                </div>
+            </div></div>`;
+        document.body.appendChild(modal);
+}
+
+function renderRoomAvailability(room) {
+        // Build hour slots 10-18
+        const hours = Array.from({length:8}, (_,i)=> i+10);
+        let rows = '<div class="mb-2"><strong>'+room.roomName+'</strong></div><div class="d-flex flex-wrap">';
+        hours.forEach(h => {
+                const start = new Date(); start.setHours(h,0,0,0);
+                const end = new Date(); end.setHours(h+1,0,0,0);
+                const booked = room.bookings.some(b => (new Date(b.startUtc)) < end && (new Date(b.endUtc)) > start);
+                rows += `<div class="badge ${booked?'bg-danger':'bg-success'} me-2 mb-2" style="min-width:90px;">${h}:00-${h+1}:00 ${booked?'Booked':'Free'}</div>`;
+        });
+        rows += '</div><hr/>';
+        return rows;
 }
 
 function showLoading(show) {
@@ -701,19 +808,19 @@ function showLoading(show) {
 }
 
 function showNotification(message, type = 'info') {
-    // Create toast notification
+    // Create toast/alert notification (Bootstrap 5 compatible)
     const toast = document.createElement('div');
     toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
     toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     toast.innerHTML = `
-        ${message}
-        <button type="button" class="close" data-dismiss="alert">
-            <span>&times;</span>
-        </button>
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="me-3">${message}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     `;
-    
+
     document.body.appendChild(toast);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
         if (toast.parentNode) {
@@ -724,10 +831,11 @@ function showNotification(message, type = 'info') {
 
 function updateConnectionStatus(connected) {
     const status = document.getElementById('connectionStatus');
+    if (!status) return;
     if (connected) {
-        status.innerHTML = '<span class="badge badge-success"><i class="fas fa-wifi"></i> Connected</span>';
+        status.innerHTML = '<span class="badge bg-success"><i class="fas fa-wifi"></i> Connected</span>';
     } else {
-        status.innerHTML = '<span class="badge badge-danger"><i class="fas fa-wifi"></i> Disconnected</span>';
+        status.innerHTML = '<span class="badge bg-danger"><i class="fas fa-wifi"></i> Disconnected</span>';
     }
 }
 
@@ -735,3 +843,9 @@ function getAntiForgeryToken() {
     const token = document.querySelector('input[name="__RequestVerificationToken"]');
     return token ? token.value : '';
 }
+
+// Periodic refresh (every minute)
+setInterval(() => {
+    refreshCurrentView();
+    updateStats();
+}, 60000);

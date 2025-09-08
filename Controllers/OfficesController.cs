@@ -17,7 +17,8 @@ namespace Gate_Pass_management.Controllers
         }
 
         // GET: api/v1/offices
-        [HttpGet]
+    [HttpGet]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         public async Task<ActionResult<IEnumerable<object>>> GetOffices()
         {
             try
@@ -43,7 +44,8 @@ namespace Gate_Pass_management.Controllers
         }
 
         // POST: api/v1/offices/seed-india
-        [HttpPost("seed-india")]
+    [HttpPost("seed-india")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         public async Task<IActionResult> SeedIndiaOffices()
         {
             try
@@ -102,7 +104,8 @@ namespace Gate_Pass_management.Controllers
         }
 
         // GET: api/v1/offices/{id}/rooms
-        [HttpGet("{id}/rooms")]
+    [HttpGet("{id}/rooms")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         public async Task<ActionResult<IEnumerable<object>>> GetOfficeRooms(Guid id)
         {
             try

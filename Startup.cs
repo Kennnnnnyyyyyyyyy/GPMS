@@ -115,6 +115,7 @@ namespace Gate_Pass_management
                 endpoints.MapControllers(); // Enable API controllers
                 endpoints.MapHub<VisitorMetricsHub>("/hubs/visitorMetrics");
                 endpoints.MapHub<VisitorTrackingHub>("/hubs/visitorTracking");
+                endpoints.MapHub<SchedulerHub>("/hubs/scheduler");
             });
 
             // Seed the database with initial data

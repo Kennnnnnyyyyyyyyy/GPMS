@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using Gate_Pass_management.Domain.Scheduler;
 
 namespace eTickets.Data
 {
@@ -20,6 +21,27 @@ namespace eTickets.Data
 
             // Apply migrations (creates DB + Identity tables if missing)
             context.Database.Migrate();
+
+            // Optional maintenance: clear all scheduler meetings if requested via env var
+            try
+            {
+                var clearMeetingsFlag = Environment.GetEnvironmentVariable("CLEAR_SCHEDULER_MEETINGS");
+                if (!string.IsNullOrWhiteSpace(clearMeetingsFlag) && clearMeetingsFlag.Trim() == "1")
+                {
+                    var allAttendees = context.MeetingAttendees.ToList();
+                    if (allAttendees.Count > 0)
+                    {
+                        context.MeetingAttendees.RemoveRange(allAttendees);
+                    }
+                    var allMeetings = context.SchedulerMeetings.ToList();
+                    if (allMeetings.Count > 0)
+                    {
+                        context.SchedulerMeetings.RemoveRange(allMeetings);
+                    }
+                    context.SaveChanges();
+                }
+            }
+            catch { /* ignore purge failures */ }
 
             // Seed Identity roles & admin user
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
