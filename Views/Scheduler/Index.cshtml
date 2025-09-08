@@ -1,0 +1,263 @@
+@{
+    ViewData["Title"] = "Meeting Scheduler";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="text-primary">
+                    <i class="fas fa-calendar-alt"></i> Meeting Scheduler
+                </h2>
+                <div>
+                    <button class="btn btn-success" onclick="showCreateMeetingModal()">
+                        <i class="fas fa-plus"></i> Schedule Meeting
+                    </button>
+                    <button class="btn btn-info" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Office Selection Cards -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4>Select Office Location</h4>
+            <div id="officesContainer" class="row">
+                <!-- Offices will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Today's Meetings</h5>
+                    <h2 id="todayMeetingsCount">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Available Rooms</h5>
+                    <h2 id="availableRoomsCount">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>This Week</h5>
+                    <h2 id="weekMeetingsCount">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Active Offices</h5>
+                    <h2 id="activeOfficesCount">-</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-calendar"></i> 
+                        Meeting Calendar
+                        <span id="selectedOfficeName" class="badge badge-primary ml-2"></span>
+                    </h5>
+                    <div class="float-right">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeView('month')">Month</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeView('week')">Week</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeView('day')">Day</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" style="min-height: 600px;">
+                        <!-- Calendar will be rendered here -->
+                        <div class="text-center text-muted mt-5">
+                            <i class="fas fa-building fa-3x"></i>
+                            <h4>Select an office to view meetings</h4>
+                            <p>Choose an office location above to see the meeting calendar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Meeting Modal -->
+<div class="modal fade" id="createMeetingModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule New Meeting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createMeetingForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meetingSubject">Subject *</label>
+                                <input type="text" class="form-control" id="meetingSubject" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meetingOffice">Office *</label>
+                                <select class="form-control" id="meetingOffice" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meetingDate">Date *</label>
+                                <input type="date" class="form-control" id="meetingDate" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meetingDuration">Duration (minutes) *</label>
+                                <select class="form-control" id="meetingDuration" required>
+                                    <option value="30">30 minutes</option>
+                                    <option value="60" selected>1 hour</option>
+                                    <option value="90">1.5 hours</option>
+                                    <option value="120">2 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetingDescription">Description</label>
+                        <textarea class="form-control" id="meetingDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetingAttendees">Attendees (Email addresses, comma-separated)</label>
+                        <textarea class="form-control" id="meetingAttendees" rows="2" placeholder="example@domain.com, another@domain.com"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetingRoom">Preferred Room</label>
+                        <select class="form-control" id="meetingRoom">
+                            <option value="">Any available room</option>
+                            <option value="room1">Room 1</option>
+                            <option value="room2">Room 2</option>
+                            <option value="room3">Room 3</option>
+                        </select>
+                    </div>
+                    <div id="proposedSlots" class="mt-3" style="display: none;">
+                        <h6>Proposed Time Slots:</h6>
+                        <div id="slotsList"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="proposeSlots()">Find Available Slots</button>
+                <button type="button" class="btn btn-success" id="confirmMeetingBtn" style="display: none;" onclick="confirmMeeting()">Schedule Meeting</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<!-- Connection Status -->
+<div id="connectionStatus" class="position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;">
+    <span class="badge badge-success">
+        <i class="fas fa-wifi"></i> Connected
+    </span>
+</div>
+
+@section Scripts {
+    <script src="~/js/scheduler.js"></script>
+}
+
+@section Styles {
+    <style>
+        .office-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .office-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .office-card.selected {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .office-stats {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .slot-option {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .slot-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .slot-option.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .meeting-item {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 2px 0;
+            font-size: 0.8em;
+        }
+    </style>
+}

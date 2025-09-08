@@ -1,0 +1,43 @@
+@model Gate_Pass_management.Controllers.ManageViewModel
+@{
+    ViewData["Title"] = "Profile Management";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["StatusMessage"]</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Two-factor Authentication</h4>
+        @if (Model.TwoFactorEnabled)
+        {
+            <div class="alert alert-success">
+                <strong>Two-factor authentication is enabled.</strong>
+            </div>
+            <p>Recovery codes left: <strong>@Model.RecoveryCodesLeft</strong></p>
+            <form asp-action="Disable2fa" method="post" class="d-inline">
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to disable 2FA?')">
+                    Disable 2FA
+                </button>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <strong>Two-factor authentication is disabled.</strong>
+            </div>
+            @if (Model.HasAuthenticator)
+            {
+                <a asp-action="EnableAuthenticator" class="btn btn-primary">Enable 2FA</a>
+            }
+            else
+            {
+                <a asp-action="EnableAuthenticator" class="btn btn-primary">Set up authenticator app</a>
+            }
+        }
+    </div>
+</div>

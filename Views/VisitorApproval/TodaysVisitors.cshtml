@@ -1,0 +1,256 @@
+@model IEnumerable<Gate_Pass_management.Models.VisitorAppointment>
+@{
+    ViewData["Title"] = "Today's Visitors";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-day me-2"></i>
+                            Today's Visitors - @DateTime.Today.ToString("dd MMMM yyyy")
+                        </h4>
+                        <div>
+                            <span class="badge bg-light text-dark me-2" id="currentVisitorCount">
+                                Loading...
+                            </span>
+                            <a href="@Url.Action("Index")" class="btn btn-sm btn-light">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Approvals
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No visitors scheduled for today</h5>
+                            <p class="text-muted">Check back later or view pending approvals.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Summary Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">Total Scheduled</h6>
+                                                <h3>@Model.Count()</h3>
+                                            </div>
+                                            <i class="fas fa-calendar-check fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">Approved</h6>
+                                                <h3>@Model.Count(v => v.Status == Gate_Pass_management.Models.AppointmentStatus.Approved)</h3>
+                                            </div>
+                                            <i class="fas fa-check-circle fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">Pending</h6>
+                                                <h3>@Model.Count(v => v.Status == Gate_Pass_management.Models.AppointmentStatus.Pending)</h3>
+                                            </div>
+                                            <i class="fas fa-clock fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6 class="card-title">Currently Inside</h6>
+                                                <h3 id="insideCount">Loading...</h3>
+                                            </div>
+                                            <i class="fas fa-user-check fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visitors Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Visitor</th>
+                                        <th>Company</th>
+                                        <th>Host</th>
+                                        <th>Purpose</th>
+                                        <th>Status</th>
+                                        <th>Entry/Exit</th>
+                                        <th>Pass</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var appointment in Model.OrderBy(a => a.ScheduledTime))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@appointment.ScheduledTime.ToString("HH:mm")</strong>
+                                                <br>
+                                                <small class="text-muted">(@appointment.EstimatedDurationMinutes min)</small>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>@appointment.VisitorName</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-phone me-1"></i>@appointment.Mobile
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td>@(appointment.Company ?? "-")</td>
+                                            <td>
+                                                <div>
+                                                    <strong>@appointment.HostName</strong>
+                                                    @if (!string.IsNullOrEmpty(appointment.HostDepartment))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">@appointment.HostDepartment</small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span title="@appointment.PurposeOfVisit">
+                                                    @(appointment.PurposeOfVisit.Length > 40 ? 
+                                                      appointment.PurposeOfVisit.Substring(0, 40) + "..." : 
+                                                      appointment.PurposeOfVisit)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @switch (appointment.Status)
+                                                {
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Pending:
+                                                        <span class="badge bg-warning">Pending</span>
+                                                        break;
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Approved:
+                                                        <span class="badge bg-success">Approved</span>
+                                                        break;
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Rejected:
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                        break;
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Completed:
+                                                        <span class="badge bg-primary">Completed</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">@appointment.Status</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (appointment.Entries?.Any() == true)
+                                                {
+                                                    var lastEntry = appointment.Entries.OrderByDescending(e => e.Timestamp).First();
+                                                    if (lastEntry.Action == Gate_Pass_management.Models.EntryAction.CheckIn)
+                                                    {
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-sign-in-alt me-1"></i>Inside
+                                                        </span>
+                                                        <br>
+                                                        <small class="text-muted">@lastEntry.Timestamp.ToString("HH:mm")</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">
+                                                            <i class="fas fa-sign-out-alt me-1"></i>Exited
+                                                        </span>
+                                                        <br>
+                                                        <small class="text-muted">@lastEntry.Timestamp.ToString("HH:mm")</small>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Not arrived</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (appointment.GatePassId != null)
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-id-card me-1"></i>Generated
+                                                    </span>
+                                                }
+                                                else if (appointment.Status == Gate_Pass_management.Models.AppointmentStatus.Approved)
+                                                {
+                                                    <span class="text-warning">Pending</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script>
+        // SignalR connection for real-time updates
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/visitorTracking")
+            .build();
+
+        connection.start().then(function () {
+            // Request current visitor count
+            connection.invoke("GetCurrentVisitorCount");
+        }).catch(function (err) {
+            console.error(err.toString());
+        });
+
+        // Handle visitor count updates
+        connection.on("VisitorCountUpdate", function (count) {
+            document.getElementById("currentVisitorCount").textContent = count + " Currently Inside";
+            document.getElementById("insideCount").textContent = count;
+        });
+
+        // Handle check-in/check-out notifications
+        connection.on("VisitorCheckedIn", function (data) {
+            // You could add toast notifications here
+            console.log("Visitor checked in:", data);
+        });
+
+        connection.on("VisitorCheckedOut", function (data) {
+            // You could add toast notifications here
+            console.log("Visitor checked out:", data);
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}

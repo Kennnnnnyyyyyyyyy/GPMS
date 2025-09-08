@@ -1,0 +1,27 @@
+@model Gate_Pass_management.Models.GatePass
+@{
+    ViewData["Title"] = "Gate Pass Details";
+}
+<h1>Gate Pass @Model.PassNumber</h1>
+<dl class="row">
+    <dt class="col-sm-2">Visitor</dt><dd class="col-sm-10">@Model.VisitorName</dd>
+    <dt class="col-sm-2">Mobile</dt><dd class="col-sm-10">@Model.Mobile</dd>
+    <dt class="col-sm-2">Location</dt><dd class="col-sm-10">Main Office</dd>
+    <dt class="col-sm-2">Valid Window</dt><dd class="col-sm-10">@Model.ValidFromUtc.ToLocalTime():g - @Model.ValidToUtc.ToLocalTime():g</dd>
+    <dt class="col-sm-2">Status</dt><dd class="col-sm-10">@Model.Status</dd>
+    <dt class="col-sm-2">QR (placeholder)</dt><dd class="col-sm-10"><code>@Model.QRCodeValue</code></dd>
+</dl>
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    @if (Model.Status == Gate_Pass_management.Models.GatePassStatus.Issued)
+    {
+        <form asp-action="MarkUsed" method="post" class="d-inline">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button class="btn btn-success">Mark Used</button>
+        </form>
+        <form asp-action="Revoke" method="post" class="d-inline ms-2">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button class="btn btn-danger">Revoke</button>
+        </form>
+    }
+</p>

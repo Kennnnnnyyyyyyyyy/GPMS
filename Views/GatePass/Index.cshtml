@@ -1,0 +1,33 @@
+@model IEnumerable<Gate_Pass_management.Models.GatePass>
+@{
+    ViewData["Title"] = "Gate Passes";
+}
+<h1>Gate Passes</h1>
+<p><a class="btn btn-primary" asp-action="Create">Issue New Pass</a></p>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Visitor</th>
+            <th>Mobile</th>
+            <th>Site</th>
+            <th>Valid</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.PassNumber</td>
+            <td>@p.VisitorName</td>
+            <td>@p.Mobile</td>
+            <td>Main Office</td>
+            <td>@p.ValidFromUtc.ToLocalTime():g - @p.ValidToUtc.ToLocalTime():g</td>
+            <td>@p.Status</td>
+            <td><a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@p.Id">Details</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

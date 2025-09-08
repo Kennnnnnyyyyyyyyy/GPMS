@@ -1,0 +1,193 @@
+@model Gate_Pass_management.Controllers.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<h1>Admin Dashboard</h1>
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        @await Html.PartialAsync("_LiveVisitorsCard")
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Today's Visitors</h5>
+                <h2 class="card-text">@Model.TodayVisitors</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">This Week</h5>
+                <h2 class="card-text">@Model.WeeklyVisitors</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <h5 class="card-title">This Month</h5>
+                <h2 class="card-text">@Model.MonthlyVisitors</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Infrastructure & System Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="card-title">Active Sites</h6>
+                <h4>@Model.TotalSites</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="card-title">Active Rooms</h6>
+                <h4>@Model.TotalRooms</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="card-title">Active Gate Passes</h6>
+                <h4>@Model.ActiveGatePasses</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="card-title">Pending SMS</h6>
+                <h4>@Model.PendingSms</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Tables -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Daily Visitors (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyVisitorsChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Top Companies (This Month)</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.TopCompanies.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                    @foreach (var company in Model.TopCompanies)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>@company.Company</span>
+                            <span class="badge bg-primary">@company.Count</span>
+                        </li>
+                    }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No data available</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Visitors -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Visitors</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Site</th>
+                                <th>Visit Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var visitor in Model.RecentVisitors)
+                        {
+                            <tr>
+                                <td>@visitor.VisitorName</td>
+                                <td>@visitor.CompanyName</td>
+                                <td>Main Office</td>
+                                <td>@visitor.VisitDateTime?.ToString("g")</td>
+                                <td>
+                                    @if (visitor.VisitEndDateTime.HasValue)
+                                    {
+                                        <span class="badge bg-secondary">Completed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Daily Visitors Chart
+    const ctx = document.getElementById('dailyVisitorsChart').getContext('2d');
+    const chartData = @Html.Raw(Json.Serialize(Model.DailyVisitorsChart.Select(d => new { 
+        Date = d.Date.ToString("MMM dd"), 
+        Count = d.Count 
+    })));
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(d => d.Date),
+            datasets: [{
+                label: 'Daily Visitors',
+                data: chartData.map(d => d.Count),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+}

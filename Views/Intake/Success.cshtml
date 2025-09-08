@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "Registration Successful";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Registration Successful!</h2>
+                    <p class="lead text-muted mb-4">
+                        Thank you for submitting your visitor registration request.
+                    </p>
+                    
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">Your Appointment Details</h5>
+                            <div class="row text-start">
+                                <div class="col-6">
+                                    <strong>Appointment ID:</strong>
+                                </div>
+                                <div class="col-6">
+                                    #@ViewBag.AppointmentId
+                                </div>
+                                <div class="col-6">
+                                    <strong>Visitor Name:</strong>
+                                </div>
+                                <div class="col-6">
+                                    @ViewBag.VisitorName
+                                </div>
+                                <div class="col-6">
+                                    <strong>Scheduled Date:</strong>
+                                </div>
+                                <div class="col-6">
+                                    @ViewBag.ScheduledDate
+                                </div>
+                                <div class="col-6">
+                                    <strong>Scheduled Time:</strong>
+                                </div>
+                                <div class="col-6">
+                                    @ViewBag.ScheduledTime
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info text-start">
+                        <h6><i class="fas fa-info-circle me-2"></i>What happens next?</h6>
+                        <ul class="mb-0">
+                            <li><strong>Approval Process:</strong> Your host will be notified and your appointment will be reviewed</li>
+                            <li><strong>Notification:</strong> You will receive updates on your appointment status</li>
+                            <li><strong>Gate Pass:</strong> Once approved, a digital gate pass will be generated</li>
+                            <li><strong>Visit Day:</strong> Bring your photo ID and report to the main reception</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning text-start">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Important Notes</h6>
+                        <ul class="mb-0">
+                            <li>Please keep your appointment ID <strong>#@ViewBag.AppointmentId</strong> for reference</li>
+                            <li>Arrive 10-15 minutes before your scheduled time</li>
+                            <li>Contact your host if you need to reschedule or cancel</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .fas.fa-check-circle {
+        animation: checkmark 0.6s ease-in-out;
+    }
+    
+    @@keyframes checkmark {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>

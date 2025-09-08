@@ -1,0 +1,724 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 1060px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  max-width: 100%;
+  padding-top: 76px; /* Account for fixed navbar */
+  background: linear-gradient(135deg, #0a1b2e 0%, #1e3a5f 50%, #2d5a87 100%);
+  background-attachment: fixed;
+  color: #f5f5f5;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Dark Theme Global Styles */
+.bg-light {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+}
+
+.text-dark {
+  color: #f5f5f5 !important;
+}
+
+/* Brighten previously muted text for universal light font */
+.text-muted {
+  color: #e2e8f0 !important; /* lighter slate */
+}
+
+.text-secondary {
+  color: #a0aec0 !important;
+}
+
+/* Cards and Panels */
+.card {
+  background-color: #1b2a41 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f5f5f5 !important;
+}
+
+.card-header {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f5 !important;
+}
+
+.card-body {
+  color: #f5f5f5 !important;
+}
+
+.card-title {
+  color: #00d2ff !important;
+}
+
+.card-text {
+  color: #a0aec0 !important;
+}
+
+/* Panels and Wells */
+.panel,
+.well {
+  background-color: #1b2a41 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  color: #f5f5f5 !important;
+}
+
+/* Tables */
+.table {
+  color: #f5f5f5 !important;
+  background-color: transparent !important;
+}
+
+.table-dark {
+  background-color: #1b2a41 !important;
+}
+
+.table thead th {
+  background-color: #203a43 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #00d2ff !important;
+}
+
+.table td, .table th {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 210, 255, 0.1) !important;
+}
+
+/* Forms */
+.form-control {
+  background-color: #1b2a41 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f5f5f5 !important;
+  border-radius: 8px !important;
+}
+
+.form-control:focus {
+  background-color: #1b2a41 !important;
+  border-color: #00d2ff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 210, 255, 0.25) !important;
+  color: #f5f5f5 !important;
+}
+
+.form-control::placeholder {
+  color: #a0aec0 !important;
+}
+
+.form-label {
+  color: #f5f5f5 !important;
+  font-weight: 500;
+}
+
+.input-group-text {
+  background-color: #203a43 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #f5f5f5 !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #00a8cc, #5855eb) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3) !important;
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #10b981, #059669) !important;
+  border: none !important;
+  border-radius: 8px !important;
+}
+
+.btn-warning {
+  background: linear-gradient(45deg, #f59e0b, #d97706) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #1b2a41 !important;
+  font-weight: 600;
+}
+
+.btn-danger {
+  background: linear-gradient(45deg, #ef4444, #dc2626) !important;
+  border: none !important;
+  border-radius: 8px !important;
+}
+
+.btn-secondary {
+  background-color: #374151 !important;
+  border-color: #374151 !important;
+  color: #f5f5f5 !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-primary {
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #00d2ff !important;
+  color: #1b2a41 !important;
+}
+
+/* Alerts */
+.alert {
+  border-radius: 10px !important;
+  border: none !important;
+}
+
+.alert-info {
+  background: linear-gradient(45deg, rgba(0, 210, 255, 0.1), rgba(99, 102, 241, 0.1)) !important;
+  color: #00d2ff !important;
+  border-left: 4px solid #00d2ff !important;
+}
+
+.alert-warning {
+  background: linear-gradient(45deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1)) !important;
+  color: #f59e0b !important;
+  border-left: 4px solid #f59e0b !important;
+}
+
+.alert-danger {
+  background: linear-gradient(45deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1)) !important;
+  color: #f87171 !important;
+  border-left: 4px solid #ef4444 !important;
+}
+
+.alert-success {
+  background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1)) !important;
+  color: #34d399 !important;
+  border-left: 4px solid #10b981 !important;
+}
+
+/* Badges */
+.badge {
+  border-radius: 6px !important;
+  font-weight: 500;
+}
+
+.bg-info {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+}
+
+.bg-secondary {
+  background-color: #374151 !important;
+}
+
+.bg-success {
+  background: linear-gradient(45deg, #10b981, #059669) !important;
+}
+
+.bg-warning {
+  background: linear-gradient(45deg, #f59e0b, #d97706) !important;
+  color: #1b2a41 !important;
+}
+
+.bg-danger {
+  background: linear-gradient(45deg, #ef4444, #dc2626) !important;
+}
+
+/* High-contrast KPI cards */
+.card.bg-success, .card.bg-info, .card.bg-warning, .card.bg-danger, .card.bg-primary {
+  color: #ffffff !important;
+}
+
+.card.bg-success .card-title, .card.bg-info .card-title, .card.bg-warning .card-title, .card.bg-danger .card-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.card.bg-success h2, .card.bg-info h2, .card.bg-warning h2, .card.bg-danger h2 {
+  color: #ffffff !important;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Table readability tweaks */
+.table tbody tr td {
+  color: #e2e8f0 !important;
+}
+
+/* Ensure ALL nested text inside table cells stays light */
+.table tbody tr td *,
+.table tbody tr td small,
+.table tbody tr td span,
+.table tbody tr td strong {
+  color: #f1f5f9 !important;
+}
+
+/* Headings or emphasized labels inside tables */
+.table tbody tr td strong {
+  font-weight: 600;
+}
+
+/* Override any Bootstrap utility that might darken text in rows */
+tr[class*="text-"], td[class*="text-"] {
+  color: #f1f5f9 !important;
+}
+
+.table tbody tr td .badge {
+  font-weight: 600;
+}
+
+/* Prevent very dark text in warning badges on dark background */
+.badge.bg-warning, .bg-warning .badge {
+  color: #1b2a41 !important;
+}
+
+/* Improve contrast for links inside dark cards */
+.card a { color: #60a5fa; }
+.card a:hover { color: #93c5fd; }
+
+/* Modals */
+.modal-content {
+  background-color: #1b2a41 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: #f5f5f5 !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-title {
+  color: #00d2ff !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  background-color: #1b2a41 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dropdown-item {
+  color: #f5f5f5 !important;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(0, 210, 255, 0.1) !important;
+  color: #00d2ff !important;
+}
+
+.dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Navigation Pills/Tabs */
+.nav-pills .nav-link.active {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+  color: #fff !important;
+}
+
+.nav-tabs .nav-link {
+  color: #a0aec0 !important;
+  border-color: transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #1b2a41 !important;
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+}
+
+/* List Groups */
+.list-group-item {
+  background-color: #1b2a41 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f5 !important;
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 210, 255, 0.05) !important;
+}
+
+.list-group-item.active {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+  border-color: #00d2ff !important;
+}
+
+/* Pagination */
+.page-link {
+  background-color: #1b2a41 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #00d2ff !important;
+}
+
+.page-link:hover {
+  background-color: rgba(0, 210, 255, 0.1) !important;
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+  border-color: #00d2ff !important;
+}
+
+/* Accordion */
+.accordion-button {
+  background-color: #1b2a41 !important;
+  color: #f5f5f5 !important;
+  border: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #203a43 !important;
+  color: #00d2ff !important;
+}
+
+.accordion-body {
+  background-color: #1b2a41 !important;
+  color: #f5f5f5 !important;
+}
+
+/* Progress Bars */
+.progress {
+  background-color: #374151 !important;
+}
+
+.progress-bar {
+  background: linear-gradient(45deg, #00d2ff, #6366f1) !important;
+}
+
+/* Footer */
+footer {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 100%) !important;
+  color: #a0aec0 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1b2a41;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.7)), url('/img/sidebar-bg.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: local;
+  transition: left 0.3s ease;
+  z-index: 1050;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1rem;
+}
+
+.sidebar-content {
+  padding: 0 0.5rem;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.75rem 1.25rem;
+  margin: 0.25rem 0;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  position: relative;
+}
+
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.sidebar .nav-link.active {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.sidebar .nav-link i {
+  width: 20px;
+  margin-right: 0.75rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.sidebar .nav-link span {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Visitors submenu */
+.submenu {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 0.375rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.submenu-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  margin: 0.125rem 0;
+  font-size: 0.9rem;
+}
+
+.submenu-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.submenu-link.active {
+  background: linear-gradient(45deg, #28a745, #1e7e34);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.submenu-link i {
+  width: 16px;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.visitors-toggle .collapse-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+/* Main content adjustment */
+.main-content {
+  padding: 2rem 0;
+  min-height: calc(100vh - 76px);
+}
+
+/* Navbar adjustments */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 260px;
+    left: -260px;
+  }
+  
+  .main-content {
+    padding: 1rem 0;
+  }
+  
+  .navbar .input-group {
+    width: 200px !important;
+  }
+  
+  .navbar .navbar-text {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 240px;
+    left: -240px;
+  }
+  
+  .navbar .input-group {
+    width: 150px !important;
+  }
+  
+  .navbar .navbar-brand img {
+    height: 35px !important;
+  }
+}
+
+/* Animation enhancements */
+.sidebar .nav-link,
+.sidebar .submenu-link {
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.sidebar .nav-link:hover,
+.sidebar .submenu-link:hover {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Scrollbar styling for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* =============================================================
+   GLOBAL LIGHT TEXT OVERRIDE (Accessibility / Contrast Pass)
+   Goal: Ensure all general textual UI elements render with a
+   high-contrast light color against the dark theme backgrounds.
+   Scoped to common typographic & data display elements while
+   deliberately avoiding buttons & status-indicative utility
+   classes so their semantic colors remain intact.
+   -------------------------------------------------------------
+   If you need to exempt a component, add a more specific rule
+   after this block (or apply .force-dark-text on the element).
+   ============================================================= */
+
+/* Core structural & typographic elements */
+body, body.dark-theme,
+body :where(p, div, span, a, li, dt, dd, label, strong, small,
+            h1, h2, h3, h4, h5, h6) {
+  color: #f1f5f9 !important; /* near-white for softer contrast than pure #fff */
+}
+
+/* Tables & data cells */
+table, .table, .table thead th, .table tbody td, .table tbody th,
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  color: #f1f5f9 !important;
+}
+
+/* Card content (not overriding badges & buttons) */
+.card, .card-body, .card-title, .card-text,
+.card-body :where(p, span, div, small, strong, h5, h6) {
+  color: #f1f5f9 !important;
+}
+
+/* Lists */
+.list-group-item { color: #f1f5f9 !important; }
+
+/* Navigation (keep active link visibility) */
+.nav, .nav-link, .navbar, .navbar *:not(.btn) { color: #f1f5f9 !important; }
+.nav-link.active, .nav-link:hover { color: #ffffff !important; }
+
+/* Forms */
+input, textarea, select, .form-control, .form-select {
+  color: #f1f5f9 !important;
+  background-color: #1e293b; /* deep slate */
+  border-color: #334155;
+}
+input:focus, textarea:focus, select:focus, .form-control:focus, .form-select:focus {
+  color: #ffffff !important;
+  background-color: #1e293b;
+  border-color: #64748b;
+  box-shadow: 0 0 0 .15rem rgba(148, 163, 184, .25);
+}
+::placeholder { color: #cbd5e1 !important; opacity: 1; }
+
+/* Muted text still needs sufficient contrast */
+.text-muted { color: #cbd5e1 !important; }
+
+/* Preserve semantic utility colors by reasserting them (rank > base block) */
+.text-danger { color: #f87171 !important; }
+.text-warning { color: #fbbf24 !important; }
+.text-success { color: #4ade80 !important; }
+.text-info { color: #38bdf8 !important; }
+
+/* Badges & buttons keep their palette */
+.badge, .btn, .btn * { color: inherit !important; }
+
+/* Optional escape hatch */
+.force-dark-text { color: #1e293b !important; }
+
+/* High specificity edge case: deep nested spans inside table cells */
+td span, th span { color: #f1f5f9 !important; }
+
+/* End GLOBAL LIGHT TEXT OVERRIDE */

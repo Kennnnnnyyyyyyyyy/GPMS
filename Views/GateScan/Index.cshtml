@@ -1,0 +1,307 @@
+@{
+    ViewData["Title"] = "Gate Scanner";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-qrcode me-2"></i>
+                        Gate Pass Scanner
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Real-time Visitor Count -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h5>Visitors Currently Inside</h5>
+                                    <h2 id="currentCount">Loading...</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h5>Last Scan</h5>
+                                    <h6 id="lastScan">No scans yet</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scanner Interface -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Check In
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="checkinForm">
+                                        <div class="mb-3">
+                                            <label for="checkinQR" class="form-label">QR Code</label>
+                                            <div class="input-group">
+                                                <input type="text" id="checkinQR" class="form-control" 
+                                                       placeholder="Scan or enter QR code" autofocus>
+                                                <button type="button" class="btn btn-outline-primary" 
+                                                        onclick="startQRCamera('checkinQR')">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="checkinGate" class="form-label">Gate Number</label>
+                                            <input type="text" id="checkinGate" class="form-control" 
+                                                   placeholder="e.g., Gate 1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="checkinSecurity" class="form-label">Security Personnel</label>
+                                            <input type="text" id="checkinSecurity" class="form-control" 
+                                                   placeholder="Security officer name">
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Check In Visitor
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Check Out
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="checkoutForm">
+                                        <div class="mb-3">
+                                            <label for="checkoutQR" class="form-label">QR Code</label>
+                                            <div class="input-group">
+                                                <input type="text" id="checkoutQR" class="form-control" 
+                                                       placeholder="Scan or enter QR code">
+                                                <button type="button" class="btn btn-outline-danger" 
+                                                        onclick="startQRCamera('checkoutQR')">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="checkoutGate" class="form-label">Gate Number</label>
+                                            <input type="text" id="checkoutGate" class="form-control" 
+                                                   placeholder="e.g., Gate 1">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="checkoutSecurity" class="form-label">Security Personnel</label>
+                                            <input type="text" id="checkoutSecurity" class="form-control" 
+                                                   placeholder="Security officer name">
+                                        </div>
+                                        <button type="submit" class="btn btn-danger w-100">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Check Out Visitor
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Camera Modal -->
+                    <div class="modal fade" id="qrCameraModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">QR Code Scanner</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <video id="qrCamera" width="100%" height="400" style="border: 1px solid #ccc;"></video>
+                                    <p class="mt-2 text-muted">Position the QR code within the camera view</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div id="alertContainer" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <script>
+        let html5QrCode = null;
+        let currentInputField = null;
+
+        // SignalR connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/visitorTracking")
+            .build();
+
+        connection.start().then(function () {
+            connection.invoke("GetCurrentVisitorCount");
+        }).catch(function (err) {
+            console.error('SignalR Error:', err.toString());
+        });
+
+        // Handle visitor count updates
+        connection.on("VisitorCountUpdate", function (count) {
+            document.getElementById("currentCount").textContent = count;
+        });
+
+        // Check-in form
+        document.getElementById('checkinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const qrCode = document.getElementById('checkinQR').value.trim();
+            const gateNumber = document.getElementById('checkinGate').value.trim();
+            const securityPersonnel = document.getElementById('checkinSecurity').value.trim();
+            
+            if (!qrCode) {
+                showAlert('Please enter or scan a QR code', 'warning');
+                return;
+            }
+            
+            processScan(qrCode, 'checkin', gateNumber, securityPersonnel);
+        });
+
+        // Check-out form
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const qrCode = document.getElementById('checkoutQR').value.trim();
+            const gateNumber = document.getElementById('checkoutGate').value.trim();
+            const securityPersonnel = document.getElementById('checkoutSecurity').value.trim();
+            
+            if (!qrCode) {
+                showAlert('Please enter or scan a QR code', 'warning');
+                return;
+            }
+            
+            processScan(qrCode, 'checkout', gateNumber, securityPersonnel);
+        });
+
+        function processScan(qrCode, action, gateNumber, securityPersonnel) {
+            fetch('@Url.Action("ProcessScan")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: new URLSearchParams({
+                    qrCode: qrCode,
+                    action: action,
+                    gateNumber: gateNumber,
+                    securityPersonnel: securityPersonnel
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message + ' at ' + data.timestamp, 'success');
+                    document.getElementById('lastScan').textContent = 
+                        action.charAt(0).toUpperCase() + action.slice(1) + ' at ' + data.timestamp;
+                    document.getElementById('currentCount').textContent = data.currentCount;
+                    
+                    // Clear forms
+                    if (action === 'checkin') {
+                        document.getElementById('checkinForm').reset();
+                        document.getElementById('checkinQR').focus();
+                    } else {
+                        document.getElementById('checkoutForm').reset();
+                        document.getElementById('checkoutQR').focus();
+                    }
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An error occurred while processing the scan', 'danger');
+            });
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function startQRCamera(inputFieldId) {
+            currentInputField = inputFieldId;
+            const modal = new bootstrap.Modal(document.getElementById('qrCameraModal'));
+            modal.show();
+            
+            // Start QR code scanner when modal is shown
+            document.getElementById('qrCameraModal').addEventListener('shown.bs.modal', function () {
+                if (html5QrCode) {
+                    html5QrCode.stop();
+                }
+                
+                html5QrCode = new Html5Qrcode("qrCamera");
+                
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    (decodedText, decodedResult) => {
+                        document.getElementById(currentInputField).value = decodedText;
+                        html5QrCode.stop();
+                        modal.hide();
+                    },
+                    (errorMessage) => {
+                        // Handle scan error
+                    }
+                ).catch(err => {
+                    console.error('QR Scanner Error:', err);
+                    showAlert('Unable to start camera. Please enter QR code manually.', 'warning');
+                    modal.hide();
+                });
+            });
+            
+            // Stop scanner when modal is hidden
+            document.getElementById('qrCameraModal').addEventListener('hidden.bs.modal', function () {
+                if (html5QrCode) {
+                    html5QrCode.stop();
+                }
+            });
+        }
+
+        // Get initial visitor count
+        fetch('@Url.Action("GetCurrentVisitorCount", "GatePassApi")')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('currentCount').textContent = data.count;
+            })
+            .catch(error => console.error('Error fetching visitor count:', error));
+    </script>
+}

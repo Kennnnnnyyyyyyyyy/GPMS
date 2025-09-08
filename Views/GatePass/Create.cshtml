@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Issue Gate Pass";
+}
+<h1>Issue Gate Pass</h1>
+<form method="post" class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label">Visitor Name</label>
+        <input name="visitorName" class="form-control" required />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Mobile</label>
+        <input name="mobile" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Location</label>
+        <input type="text" name="location" class="form-control" value="Main Office" readonly />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Valid From (local)</label>
+        <input type="datetime-local" name="validFrom" class="form-control" value="@ViewBag.DefaultValidFrom" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Valid To (local)</label>
+        <input type="datetime-local" name="validTo" class="form-control" value="@ViewBag.DefaultValidTo" />
+    </div>
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">Issue</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

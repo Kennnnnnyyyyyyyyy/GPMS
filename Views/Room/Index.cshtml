@@ -1,0 +1,44 @@
+@model IEnumerable<Room>
+@{
+    ViewData["Title"] = "Rooms";
+}
+<h1 class="mb-3">Rooms</h1>
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Room</a>
+</p>
+<table class="table table-striped table-bordered table-sm align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Capacity</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@(item.Location ?? "Main Office")</td>
+            <td>@item.Capacity</td>
+            <td>
+                @if (item.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a class="btn btn-sm btn-outline-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

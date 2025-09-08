@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title class="fontw">@ViewData["Title"] - Gate Pass Management</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <!-- Top Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Sidebar Toggle Button -->
+            <button class="btn btn-outline-light me-3" type="button" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <!-- Page Title -->
+            <span class="navbar-text text-white me-auto">
+                @ViewData["Title"]
+            </span>
+            
+            <!-- Visitor ID Search -->
+            <div class="d-flex align-items-center me-3">
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" class="form-control" placeholder="Enter Visitor ID" id="visitorIdInput">
+                    <button class="btn btn-success" type="button" id="visitorGoBtn">
+                        <i class="bi bi-search"></i> Go
+                    </button>
+                </div>
+            </div>
+            
+            <!-- User Info & Logout - Moved to extreme right -->
+            <div class="navbar-nav ms-auto">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="bi bi-gear"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                    <button type="submit" class="btn btn-link text-decoration-none p-0 text-dark">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Login">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="text-white mb-0">
+                <i class="bi bi-building"></i> Navigation
+            </h5>
+            <button class="btn btn-outline-light btn-sm" id="sidebarClose">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-content">
+            <ul class="nav flex-column">
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Room" ? "active" : "")" 
+                           asp-controller="Room" asp-action="Index">
+                            <i class="bi bi-door-open"></i>
+                            <span>Rooms</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Scheduler" ? "active" : "")" 
+                           asp-controller="Scheduler" asp-action="Index">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Meeting Scheduler</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" 
+                           asp-controller="Admin" asp-action="Dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Sms" ? "active" : "")" 
+                           asp-controller="Sms" asp-action="Index">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>SMS</span>
+                        </a>
+                    </li>
+                }
+                
+                @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "GatePass" ? "active" : "")" 
+                           asp-controller="GatePass" asp-action="Index">
+                            <i class="bi bi-qr-code"></i>
+                            <span>Gate Passes</span>
+                        </a>
+                    </li>
+                }
+
+                <!-- Visitors Collapsible Group -->
+                <li class="nav-item">
+                    @{
+                        var visitorsControllers = new[] { "Intake", "VisitorApproval", "QRGenerator", "GateScan" };
+                        var isVisitorsActive = visitorsControllers.Contains(ViewContext.RouteData.Values["Controller"]?.ToString());
+                    }
+                    
+                    <a class="nav-link visitors-toggle @(isVisitorsActive ? "active" : "")" href="#visitorsSubmenu" data-bs-toggle="collapse" 
+                       aria-expanded="@(isVisitorsActive ? "true" : "false")" aria-controls="visitorsSubmenu">
+                        <i class="bi bi-people"></i>
+                        <span>Visitors</span>
+                        <i class="bi bi-chevron-down ms-auto collapse-icon"></i>
+                    </a>
+                    
+                    <div class="collapse @(isVisitorsActive ? "show" : "")" id="visitorsSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Intake" ? "active" : "")" 
+                                   asp-controller="Intake" asp-action="Index">
+                                    <i class="bi bi-person-plus"></i>
+                                    <span>Visitor Registration</span>
+                                </a>
+                            </li>
+                            
+                            @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "VisitorApproval" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" 
+                                       asp-controller="VisitorApproval" asp-action="Index">
+                                        <i class="bi bi-clipboard-check"></i>
+                                        <span>Pending Approvals</span>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "VisitorApproval" && ViewContext.RouteData.Values["Action"]?.ToString() == "TodaysVisitors" ? "active" : "")" 
+                                       asp-controller="VisitorApproval" asp-action="TodaysVisitors">
+                                        <i class="bi bi-calendar-day"></i>
+                                        <span>Today's Visitors</span>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "QRGenerator" ? "active" : "")" 
+                                       asp-controller="QRGenerator" asp-action="Index">
+                                        <i class="bi bi-qr-code-scan"></i>
+                                        <span>QR Generator</span>
+                                    </a>
+                                </li>
+                            }
+                            
+                            @if (User.IsInRole("Admin") || User.IsInRole("Reception") || User.IsInRole("SecurityGuard"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "GateScan" ? "active" : "")" 
+                                       asp-controller="GateScan" asp-action="Index">
+                                        <i class="bi bi-upc-scan"></i>
+                                        <span>Gate Scanner</span>
+                                    </a>
+                                </li>
+                            }
+                            
+                            
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="mt-auto">
+    </footer>
+
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" integrity="sha512-DrR6rMIXja+6JGZveHFkNjEcNWef39/C4R2tQeM+c/fi91t6YewsGmmKzBSSMSmc5QwDFi1Cdm42Hcps225y7A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Sidebar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            function openSidebar() {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            sidebarToggle.addEventListener('click', openSidebar);
+            sidebarClose.addEventListener('click', closeSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar when clicking main content on mobile
+            mainContent.addEventListener('click', function() {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    closeSidebar();
+                }
+            });
+
+            // Handle visitor ID search
+            const visitorGoBtn = document.getElementById('visitorGoBtn');
+            const visitorIdInput = document.getElementById('visitorIdInput');
+            
+            if (visitorGoBtn && visitorIdInput) {
+                visitorGoBtn.addEventListener('click', function() {
+                    const visitorId = visitorIdInput.value.trim();
+                    if (visitorId) {
+                        // Implement visitor search functionality - now routes to approvals
+                        window.location.href = '/VisitorApproval/TodaysVisitors?search=' + encodeURIComponent(visitorId);
+                    }
+                });
+
+                visitorIdInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        visitorGoBtn.click();
+                    }
+                });
+            }
+
+            // Rotate chevron icons on collapse
+            const collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
+            collapseToggles.forEach(toggle => {
+                const target = document.querySelector(toggle.getAttribute('href'));
+                if (target) {
+                    target.addEventListener('show.bs.collapse', function() {
+                        const icon = toggle.querySelector('.collapse-icon');
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    });
+                    
+                    target.addEventListener('hide.bs.collapse', function() {
+                        const icon = toggle.querySelector('.collapse-icon');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    });
+                }
+            });
+        });
+
+        // SignalR for visitor metrics
+        (function(){
+            try {
+                const connection = new signalR.HubConnectionBuilder().withUrl('/hubs/visitorMetrics').withAutomaticReconnect().build();
+                connection.on('metricsUpdated', function(active, total){
+                    const a = document.getElementById('activeVisitorsBadge');
+                    const t = document.getElementById('totalVisitorsBadge');
+                    if(a) a.textContent = 'Active: ' + active;
+                    if(t) t.textContent = 'Today: ' + total;
+                });
+                connection.start().then(function(){
+                    connection.invoke('RequestMetrics');
+                }).catch(e=>console.warn('Hub start failed', e));
+            } catch(e) { console.warn('Metrics hub error', e); }
+        })();
+    </script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

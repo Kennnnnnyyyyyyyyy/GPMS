@@ -1,0 +1,298 @@
+@model IEnumerable<Gate_Pass_management.Models.VisitorAppointment>
+@{
+    ViewData["Title"] = "Pending Visitor Approvals";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-check me-2"></i>
+                            Pending Visitor Approvals
+                        </h4>
+                        <div>
+                            <span class="badge bg-warning me-2">
+                                @Model.Count() Pending
+                            </span>
+                            <a href="@Url.Action("TodaysVisitors")" class="btn btn-sm btn-light">
+                                <i class="fas fa-calendar-day me-1"></i>Today's Visitors
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No pending approvals</h5>
+                            <p class="text-muted">All visitor appointments are up to date.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Visitor</th>
+                                        <th>Company</th>
+                                        <th>Purpose</th>
+                                        <th>Host</th>
+                                        <th>Scheduled</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var appointment in Model.OrderBy(a => a.ScheduledDate).ThenBy(a => a.ScheduledTime))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <strong>@appointment.VisitorName</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-phone me-1"></i>@appointment.Mobile
+                                                    </small>
+                                                    @if (!string.IsNullOrEmpty(appointment.Email))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-envelope me-1"></i>@appointment.Email
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>@(appointment.Company ?? "-")</td>
+                                            <td>
+                                                <span title="@appointment.PurposeOfVisit">
+                                                    @(appointment.PurposeOfVisit.Length > 50 ? 
+                                                      appointment.PurposeOfVisit.Substring(0, 50) + "..." : 
+                                                      appointment.PurposeOfVisit)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>@appointment.HostName</strong>
+                                                    @if (!string.IsNullOrEmpty(appointment.HostDepartment))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">@appointment.HostDepartment</small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(appointment.HostContactNumber))
+                                                    {
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-phone me-1"></i>@appointment.HostContactNumber
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>@appointment.ScheduledDate.ToString("dd-MM-yyyy")</strong>
+                                                    <br>
+                                                    <small class="text-muted">@appointment.ScheduledTime.ToString("HH:mm")</small>
+                                                    <br>
+                                                    <small class="text-muted">(@appointment.EstimatedDurationMinutes min)</small>
+                                                </div>
+                                            </td>
+                                            <td>Main Office</td>
+                                            <td>
+                                                @switch (appointment.Status)
+                                                {
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Pending:
+                                                        <span class="badge bg-warning">Pending</span>
+                                                        break;
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Approved:
+                                                        <span class="badge bg-success">Approved</span>
+                                                        break;
+                                                    case Gate_Pass_management.Models.AppointmentStatus.Rejected:
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">@appointment.Status</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (appointment.Status == Gate_Pass_management.Models.AppointmentStatus.Pending)
+                                                {
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-success"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#approveModal"
+                                                                data-appointment-id="@appointment.Id"
+                                                                data-visitor-name="@appointment.VisitorName"
+                                                                onclick="(function(btn){try{const id=btn.getAttribute('data-appointment-id');const hid=document.getElementById('approveAppointmentId');if(hid){hid.value=id;}const dbg=document.getElementById('approveCurrentIdDisplay');if(dbg){dbg.textContent=id;}console.log('[ApproveBtn Click] id=',id);}catch(e){console.warn('ApproveBtn inline error',e);}})(this)"
+                                                                title="Approve">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#rejectModal"
+                                                                data-appointment-id="@appointment.Id"
+                                                                data-visitor-name="@appointment.VisitorName"
+                                                                title="Reject">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+                                                else if (appointment.Status == Gate_Pass_management.Models.AppointmentStatus.Approved && appointment.GatePassId == null)
+                                                {
+                                                    <form asp-action="GeneratePass" method="post" style="display: inline;">
+                                                        <input type="hidden" name="id" value="@appointment.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-primary" title="Generate Pass">
+                                                            <i class="fas fa-id-card"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else if (appointment.GatePassId != null)
+                                                {
+                                                    <span class="text-success">
+                                                        <i class="fas fa-id-card me-1"></i>Pass Generated
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Approve" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Approve Visitor Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="approveAppointmentId" value="" />
+                    <p class="small text-info mb-2">Debug ID: <span id="approveCurrentIdDisplay">(not set)</span></p>
+                    <p>Are you sure you want to approve the appointment for <strong id="approveVisitorName"></strong>?</p>
+                    <div class="mb-3">
+                        <label for="approveNotes" class="form-label">Approval Notes (Optional)</label>
+                        <textarea name="notes" id="approveNotes" class="form-control" rows="3" 
+                                  placeholder="Add any notes for this approval..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check me-1"></i>Approve
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reject" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-times-circle text-danger me-2"></i>
+                        Reject Visitor Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="rejectAppointmentId" />
+                    <p>Are you sure you want to reject the appointment for <strong id="rejectVisitorName"></strong>?</p>
+                    <div class="mb-3">
+                        <label for="rejectReason" class="form-label">Reason for Rejection</label>
+                        <textarea name="reason" id="rejectReason" class="form-control" rows="3" 
+                                  placeholder="Please provide a reason for rejection..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-1"></i>Reject
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            // Vanilla handlers (avoid jQuery dependency timing issues)
+            const approveModal = document.getElementById('approveModal');
+            const rejectModal = document.getElementById('rejectModal');
+            if (approveModal) {
+                approveModal.addEventListener('show.bs.modal', e => {
+                    const btn = e.relatedTarget;
+                    const id = btn?.getAttribute('data-appointment-id') || '';
+                    const name = btn?.getAttribute('data-visitor-name') || '';
+                    document.getElementById('approveAppointmentId').value = id;
+                    document.getElementById('approveVisitorName').textContent = name;
+                    console.log('[ApproveModal] setting id', id, 'name', name);
+                });
+            }
+            if (rejectModal) {
+                rejectModal.addEventListener('show.bs.modal', e => {
+                    const btn = e.relatedTarget;
+                    const id = btn?.getAttribute('data-appointment-id') || '';
+                    const name = btn?.getAttribute('data-visitor-name') || '';
+                    document.getElementById('rejectAppointmentId').value = id;
+                    document.getElementById('rejectVisitorName').textContent = name;
+                    console.log('[RejectModal] setting id', id, 'name', name);
+                });
+            }
+
+            // Guard: log on submit
+            const approveForm = approveModal?.querySelector('form');
+            if (approveForm) {
+                approveForm.addEventListener('submit', ()=>{
+                    console.log('[ApproveForm Submit] id value=', document.getElementById('approveAppointmentId').value);
+                });
+            }
+            const rejectForm = rejectModal?.querySelector('form');
+            if (rejectForm) {
+                rejectForm.addEventListener('submit', ()=>{
+                    console.log('[RejectForm Submit] id value=', document.getElementById('rejectAppointmentId').value);
+                });
+            }
+        })();
+    </script>
+}
