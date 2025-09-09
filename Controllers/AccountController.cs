@@ -54,25 +54,33 @@ namespace Gate_Pass_management.Controllers
             // Sign out any existing session first
             await _signInManager.SignOutAsync();
             
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: true, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: true, lockoutOnFailure: true);
             
             Console.WriteLine($"Sign in result: Succeeded={result.Succeeded}, RequiresTwoFactor={result.RequiresTwoFactor}, IsLockedOut={result.IsLockedOut}");
             
             if (result.Succeeded) 
             {
-                Console.WriteLine("Login successful, redirecting to admin");
-                // Double-check the user is signed in
-                if (_signInManager.IsSignedIn(User))
+                Console.WriteLine("Login successful");
+                // Ensure we are signed in (edge case)
+                if (!_signInManager.IsSignedIn(User))
                 {
-                    return LocalRedirect(model.ReturnUrl ?? "/Admin/Dashboard");
-                }
-                else
-                {
-                    Console.WriteLine("User not signed in after PasswordSignInAsync, forcing sign in");
-                    // Force sign in if somehow it didn't work
                     await _signInManager.SignInAsync(user, isPersistent: true);
-                    return LocalRedirect(model.ReturnUrl ?? "/Admin/Dashboard");
                 }
+
+                // If user has not enabled 2FA, force setup first
+                var tfaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
+                if (!tfaEnabled)
+                {
+                    return RedirectToAction("EnableAuthenticator");
+                }
+
+                // Route by role (Employee goes to Scheduler)
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    return LocalRedirect(model.ReturnUrl ?? "/Admin/Dashboard");
+                if (await _userManager.IsInRoleAsync(user, "Employee") || await _userManager.IsInRoleAsync(user, "Reception"))
+                    return LocalRedirect(model.ReturnUrl ?? Url.Action("Index","Scheduler")!);
+                // Fallback
+                return LocalRedirect(model.ReturnUrl ?? Url.Action("Index","Home")!);
             }
             
             if (result.RequiresTwoFactor) 
@@ -100,6 +108,59 @@ namespace Gate_Pass_management.Controllers
             if (result.Succeeded) return LocalRedirect(model.ReturnUrl ?? Url.Action("Index", "Home")!);
             ModelState.AddModelError(string.Empty, "Invalid authenticator code");
             return View(model);
+        }
+
+        // Admin-only login endpoint (separate entry)
+        [AllowAnonymous]
+        public IActionResult AdminLogin(string? returnUrl = null) => View("AdminLogin", new LoginViewModel { ReturnUrl = returnUrl });
+
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdminLogin(LoginViewModel model)
+        {
+            if (!ModelState.IsValid) return View("AdminLogin", model);
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                return View("AdminLogin", model);
+            }
+
+            // Must be admin
+            if (!await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                ModelState.AddModelError(string.Empty, "You are not authorized to use Admin Sign-In.");
+                return View("AdminLogin", model);
+            }
+
+            await _signInManager.SignOutAsync();
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: true, lockoutOnFailure: true);
+
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction("LoginWith2fa", new { ReturnUrl = model.ReturnUrl });
+            }
+            if (result.Succeeded)
+            {
+                // Enforce 2FA setup for admins
+                if (!await _userManager.GetTwoFactorEnabledAsync(user))
+                {
+                    // sign-in then force setup
+                    if (!_signInManager.IsSignedIn(User))
+                        await _signInManager.SignInAsync(user, isPersistent: true);
+                    TempData["StatusMessage"] = "Admin accounts must enable 2FA before continuing.";
+                    return RedirectToAction("EnableAuthenticator");
+                }
+                return LocalRedirect(model.ReturnUrl ?? "/Admin/Dashboard");
+            }
+
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError(string.Empty, "Account locked due to multiple failed attempts. Try again later.");
+                return View("AdminLogin", model);
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid login attempt");
+            return View("AdminLogin", model);
         }
 
         [Authorize]
@@ -174,11 +235,17 @@ namespace Gate_Pass_management.Controllers
             return RedirectToAction("Manage");
         }
 
-        [HttpPost, Authorize, ValidateAntiForgeryToken]
+    [HttpPost, Authorize, ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         private async Task LoadSharedKeyAndQrCodeUriAsync(AppUser user, EnableAuthenticatorViewModel model)

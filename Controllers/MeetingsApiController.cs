@@ -11,7 +11,7 @@ namespace Gate_Pass_management.Controllers
 {
     [Route("api/v1/meetings")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin,Reception,Employee")]
     public class MeetingsApiController : ControllerBase
     {
     private readonly AppDbContext _context;
@@ -27,7 +27,6 @@ namespace Gate_Pass_management.Controllers
 
         // GET: api/v1/meetings/calendar
     [HttpGet("calendar")]
-    [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<object>>> GetCalendarMeetings(
             [FromQuery] DateTime fromUtc,
             [FromQuery] DateTime toUtc,
@@ -78,7 +77,6 @@ namespace Gate_Pass_management.Controllers
 
         // DELETE: api/v1/meetings/before?date=YYYY-MM-DD[&officeId=]
     [HttpDelete("before")]
-    [AllowAnonymous]
         public async Task<ActionResult<object>> DeleteMeetingsBefore([FromQuery] DateTime date, [FromQuery] string? officeId = null)
         {
             try
@@ -118,7 +116,6 @@ namespace Gate_Pass_management.Controllers
 
         // DELETE: api/v1/meetings/past  (everything ending before today UTC)
     [HttpDelete("past")]
-    [AllowAnonymous]
         public async Task<ActionResult<object>> DeletePastMeetings([FromQuery] string? officeId = null)
         {
             var todayUtc = DateTime.UtcNow.Date;
@@ -127,7 +124,6 @@ namespace Gate_Pass_management.Controllers
 
         // GET: api/v1/meetings/stats/today?officeId={id}
     [HttpGet("stats/today")]
-    [AllowAnonymous]
         public async Task<ActionResult<object>> GetTodayStats([FromQuery] string? officeId = null)
         {
             var today = DateTime.UtcNow.Date;
@@ -143,7 +139,6 @@ namespace Gate_Pass_management.Controllers
 
         // GET: api/v1/meetings/stats/week?officeId={id}
     [HttpGet("stats/week")]
-    [AllowAnonymous]
         public async Task<ActionResult<object>> GetWeekStats([FromQuery] string? officeId = null)
         {
             var now = DateTime.UtcNow;
@@ -160,7 +155,6 @@ namespace Gate_Pass_management.Controllers
 
         // GET: api/v1/meetings/availability?officeId={id}&date=YYYY-MM-DD
     [HttpGet("availability")]
-    [AllowAnonymous]
         public async Task<ActionResult<object>> GetAvailability([FromQuery] string officeId, [FromQuery] DateTime date)
         {
             if (!Guid.TryParse(officeId, out var officeGuid)) return BadRequest(new { error = "Invalid office ID" });
@@ -194,7 +188,6 @@ namespace Gate_Pass_management.Controllers
 
         // POST: api/v1/meetings/propose
     [HttpPost("propose")]
-    [AllowAnonymous]
     public ActionResult<object> ProposeTimeSlots([FromBody] ProposeTimeSlotsRequest request)
         {
             try

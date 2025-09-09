@@ -71,6 +71,22 @@ namespace eTickets.Data
                 userManager.AddToRoleAsync(adminUser, "Admin").GetAwaiter().GetResult();
             }
 
+            // Seed a default employee user
+            const string employeeUserName = "employee";
+            const string employeeEmail = "employee@gpms.local";
+            var empUser = userManager.FindByNameAsync(employeeUserName).GetAwaiter().GetResult();
+            if (empUser == null)
+            {
+                empUser = new AppUser
+                {
+                    UserName = employeeUserName,
+                    Email = employeeEmail,
+                    EmailConfirmed = true
+                };
+                userManager.CreateAsync(empUser, "Employee@123").GetAwaiter().GetResult();
+                userManager.AddToRoleAsync(empUser, "Employee").GetAwaiter().GetResult();
+            }
+
             // Seed sample employees for the new visitor workflow
             if (!context.Employees.Any())
             {
