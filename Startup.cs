@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OfficeOpenXml;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 using Gate_Pass_management.Services;
 using Gate_Pass_management.Hubs;
 
@@ -100,6 +102,12 @@ namespace Gate_Pass_management
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            // Serve files from the project's /assets directory at the /assets URL path
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "assets")),
+                RequestPath = "/assets"
+            });
 
             app.UseRouting();
 

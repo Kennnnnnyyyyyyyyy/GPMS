@@ -109,73 +109,82 @@
                 <h5 class="modal-title">Schedule New Meeting</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="createMeetingForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="meetingSubject">Subject *</label>
-                                <input type="text" class="form-control" id="meetingSubject" required>
+            <div class="modal-body scheduler-modal-body">
+                <div id="schedulerModalLayout" class="scheduler-layout">
+                    <div id="formPanel" class="scheduler-panel">
+                        <form id="createMeetingForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="meetingSubject">Subject *</label>
+                                        <input type="text" class="form-control" id="meetingSubject" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="meetingOffice">Office *</label>
+                                        <select class="form-control" id="meetingOffice" required>
+                                            <option value="">Select Office</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="meetingOrganizer">Organizer (who is scheduling) *</label>
+                                        <input type="text" class="form-control" id="meetingOrganizer" placeholder="Your name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="meetingDate">Date *</label>
+                                        <input type="date" class="form-control" id="meetingDate" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="meetingDuration">Duration (minutes) *</label>
+                                        <select class="form-control" id="meetingDuration" required>
+                                            <option value="30">30 minutes</option>
+                                            <option value="60" selected>1 hour</option>
+                                            <option value="90">1.5 hours</option>
+                                            <option value="120">2 hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group">
-                                <label for="meetingOffice">Office *</label>
-                                <select class="form-control" id="meetingOffice" required>
-                                    <option value="">Select Office</option>
+                                <label for="meetingDescription">Description</label>
+                                <textarea class="form-control" id="meetingDescription" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="meetingAttendees">Attendees (Email addresses, comma-separated)</label>
+                                <textarea class="form-control" id="meetingAttendees" rows="2" placeholder="example@domain.com, another@domain.com"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="meetingRoom">Preferred Room</label>
+                                <select class="form-control" id="meetingRoom">
+                                    <option value="">Any available room</option>
+                                    <option value="room1">Room 1</option>
+                                    <option value="room2">Room 2</option>
+                                    <option value="room3">Room 3</option>
                                 </select>
                             </div>
+                        </form>
+                    </div>
+                    <div id="slotsPanel" class="scheduler-panel slots-panel">
+                        <div class="slots-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Available Time Slots</h6>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="closeSlotsPanel()" aria-label="Close slots panel">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
+                        <div id="slotsList" class="slots-list"></div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="meetingOrganizer">Organizer (who is scheduling) *</label>
-                                <input type="text" class="form-control" id="meetingOrganizer" placeholder="Your name" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="meetingDate">Date *</label>
-                                <input type="date" class="form-control" id="meetingDate" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="meetingDuration">Duration (minutes) *</label>
-                                <select class="form-control" id="meetingDuration" required>
-                                    <option value="30">30 minutes</option>
-                                    <option value="60" selected>1 hour</option>
-                                    <option value="90">1.5 hours</option>
-                                    <option value="120">2 hours</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="meetingDescription">Description</label>
-                        <textarea class="form-control" id="meetingDescription" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="meetingAttendees">Attendees (Email addresses, comma-separated)</label>
-                        <textarea class="form-control" id="meetingAttendees" rows="2" placeholder="example@domain.com, another@domain.com"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="meetingRoom">Preferred Room</label>
-                        <select class="form-control" id="meetingRoom">
-                            <option value="">Any available room</option>
-                            <option value="room1">Room 1</option>
-                            <option value="room2">Room 2</option>
-                            <option value="room3">Room 3</option>
-                        </select>
-                    </div>
-                    <div id="proposedSlots" class="mt-3" style="display: none; transition: transform .3s ease;">
-                        <h6>Available Time Slots:</h6>
-                        <div id="slotsList"></div>
-                    </div>
-                </form>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -282,5 +291,63 @@
     #calendar.office-mumbai .badge.bg-secondary { background-color: #ffc107 !important; color: #212529; }
     #calendar.office-chennai .badge.bg-secondary { background-color: #dc3545 !important; }
     #calendar.office-ahmedabad .badge.bg-secondary { background-color: #28a745 !important; }
+    </style>
+    <style>
+        /* Two-pane modal layout */
+        .scheduler-modal-body {
+            padding: 0;
+        }
+        .scheduler-layout {
+            display: grid;
+            grid-template-columns: 1fr; /* mobile default */
+            gap: 0;
+            height: 60vh; /* keep modal height consistent */
+            overflow: hidden; /* contain panel scrolls */
+        }
+    @@media (min-width: 768px) {
+            .scheduler-layout {
+                grid-template-columns: 1fr 0; /* start with right panel hidden */
+                transition: grid-template-columns .3s ease;
+            }
+            .scheduler-layout.show-slots {
+                grid-template-columns: 1fr 40%;
+            }
+        }
+        .scheduler-panel {
+            padding: 1rem 1rem 0.5rem 1rem;
+            overflow: auto; /* each panel scrolls independently */
+        }
+        .slots-panel {
+            border-left: 1px solid rgba(0,0,0,.1);
+            background: rgba(0,0,0,0.02);
+            display: none; /* shown via JS */
+        }
+    @@media (min-width: 768px) {
+            .slots-panel { display: block; }
+        }
+        .scheduler-layout.show-slots .slots-panel {
+            display: block;
+        }
+        .slots-header {
+            position: sticky;
+            top: 0;
+            background: inherit;
+            padding-bottom: .5rem;
+            margin-bottom: .5rem;
+            z-index: 1;
+        }
+        .slots-list {
+            padding-right: .25rem;
+        }
+        /* On small screens stack panels; slots panel toggles below form */
+    @@media (max-width: 767.98px) {
+            .scheduler-layout {
+                height: 70vh;
+            }
+            .slots-panel {
+                border-left: none;
+                border-top: 1px solid rgba(0,0,0,.1);
+            }
+        }
     </style>
 }

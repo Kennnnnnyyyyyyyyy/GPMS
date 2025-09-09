@@ -339,15 +339,28 @@ namespace Gate_Pass_management.Controllers
         private List<object> GenerateTimeSlots(ProposeTimeSlotsRequest request, Office office)
         {
             var slots = new List<object>();
-            var currentDate = request.Date == default ? DateTime.Today : request.Date.Date;
+            // Accept either date-only string (YYYY-MM-DD) or DateTime
+            DateTime parsedDate;
+            if (!string.IsNullOrWhiteSpace(request.RawDate) && DateTime.TryParse(request.RawDate, out var dFromString))
+            {
+                parsedDate = dFromString.Date;
+            }
+            else if (request.Date != default)
+            {
+                parsedDate = request.Date.Date;
+            }
+            else
+            {
+                parsedDate = DateTime.Today;
+            }
 
             // Office timezone conversion
             var tz = TimeZoneInfo.FindSystemTimeZoneById(office.TimeZoneId ?? "Asia/Kolkata");
             DateTime LocalToUtc(DateTime local) => TimeZoneInfo.ConvertTimeToUtc(local, tz);
 
             // Business hours in local time
-            var businessStartLocal = currentDate.Add(new TimeSpan(10, 0, 0)); // enforce 10:00
-            var businessEndLocal = currentDate.Add(new TimeSpan(18, 0, 0));   // enforce 18:00
+            var businessStartLocal = parsedDate.Add(new TimeSpan(10, 0, 0)); // enforce 10:00
+            var businessEndLocal = parsedDate.Add(new TimeSpan(18, 0, 0));   // enforce 18:00
 
             // Duration in minutes
             int durationMinutes = ParseDuration(request.Duration);
@@ -369,6 +382,12 @@ namespace Gate_Pass_management.Controllers
                 var endLocal = startLocal.AddMinutes(durationMinutes);
                 var startUtc = LocalToUtc(startLocal);
                 var endUtc = LocalToUtc(endLocal);
+                // Skip slots that have started or ended already (for today, based on office local time)
+                var nowLocal = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+                if (parsedDate.Date == nowLocal.Date)
+                {
+                    if (startLocal <= nowLocal) continue; // don't offer slots that began in the past
+                }
 
                 var conflict = meetings.Any(m => m.Start < endUtc && m.End > startUtc);
 
@@ -408,6 +427,8 @@ namespace Gate_Pass_management.Controllers
     {
         public string OfficeId { get; set; } = string.Empty;
         public DateTime Date { get; set; }
+    // Accept date-only string (e.g., "2025-09-13"); JS submits this to avoid TZ shift
+    public string? RawDate { get; set; }
         public string Duration { get; set; } = string.Empty;
         public string PreferredRoom { get; set; } = string.Empty;
         public string OrganizerId { get; set; } = string.Empty;

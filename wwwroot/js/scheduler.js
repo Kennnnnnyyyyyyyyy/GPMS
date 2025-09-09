@@ -242,8 +242,7 @@ async function selectOffice(officeId, officeName) {
     
     // Load calendar for this office
     await loadCalendar();
-    
-    showNotification(`Switched to ${officeName} office`, 'info');
+    // No notification popup when switching offices (per UX request)
 }
 
 // Load rooms for selected office
@@ -374,7 +373,8 @@ function renderCalendar(meetings) {
                     return startDate.getDate() === dayCount && 
                            startDate.getMonth() === currentMonth &&
                            startDate.getFullYear() === currentYear &&
-                           endDate.getTime() > nowTs; // hide past-ended
+                           endDate.getTime() > nowTs && // hide past-ended
+                           startDate.getTime() > nowTs - 24*60*60*1000; // ignore meetings that started before now for today view
                 });
 
                 const isToday = dayCount === now.getDate() && currentMonth === now.getMonth() && currentYear === now.getFullYear();
@@ -469,7 +469,8 @@ function showCreateMeetingModal() {
     
     // Reset form
     document.getElementById('createMeetingForm').reset();
-    document.getElementById('proposedSlots').style.display = 'none';
+    // Hide slots panel state
+    closeSlotsPanel();
     document.getElementById('confirmMeetingBtn').style.display = 'none';
     selectedSlot = null;
     
@@ -501,25 +502,30 @@ function showCreateMeetingModal() {
     }
 }
 
-// Close modal function for fallback
-function closeModal() {
-    const modalElement = document.getElementById('createMeetingModal');
-    const backdrop = document.getElementById('modal-backdrop');
-    
-    modalElement.style.display = 'none';
-    modalElement.classList.remove('show');
-    document.body.classList.remove('modal-open');
-    
-    if (backdrop) {
-        backdrop.remove();
-    }
+function openSlotsPanel() {
+    const layout = document.getElementById('schedulerModalLayout');
+    const panel = document.getElementById('slotsPanel');
+    if (!layout || !panel) return;
+    layout.classList.add('show-slots');
+    panel.style.display = 'block';
+}
+
+function closeSlotsPanel() {
+    const layout = document.getElementById('schedulerModalLayout');
+    const panel = document.getElementById('slotsPanel');
+    if (!layout || !panel) return;
+    layout.classList.remove('show-slots');
+    // On small screens panel still stacks; we hide contents
+    panel.style.display = '';
+    const list = document.getElementById('slotsList');
+    if (list) list.innerHTML = '';
 }
 
 // Propose available slots
 async function proposeSlots() {
     const subject = document.getElementById('meetingSubject').value;
     const officeId = document.getElementById('meetingOffice').value || selectedOfficeId;
-    const date = document.getElementById('meetingDate').value;
+    const date = document.getElementById('meetingDate').value; // format: YYYY-MM-DD
     const duration = document.getElementById('meetingDuration').value; // as minutes string
     const roomId = document.getElementById('meetingRoom').value;
 
@@ -531,9 +537,11 @@ async function proposeSlots() {
     showLoading(true);
     
     try {
+        // Send date-only to avoid timezone shifting issues on the server
         const payload = {
             officeId: officeId,
-            date: new Date(date).toISOString(),
+            date: date,
+            rawDate: date,
             duration: String(duration),
             preferredRoom: roomId || '',
             organizerId: (currentUser && currentUser.id) ? currentUser.id : ''
@@ -544,7 +552,13 @@ async function proposeSlots() {
             credentials: 'include',
             body: JSON.stringify(payload)
         });
-        if (!resp.ok) throw new Error('Failed to propose');
+        if (!resp.ok) {
+            const txt = await resp.text().catch(()=> '');
+            console.error('Propose slots failed', resp.status, txt);
+            let msg = 'Failed to propose slots';
+            try { const j = JSON.parse(txt); if (j?.error) msg = j.error; } catch {}
+            throw new Error(msg);
+        }
         const data = await resp.json();
         const slots = (data.slots || []).map(s => ({
             startUtc: s.startUtc || s.start,
@@ -555,12 +569,8 @@ async function proposeSlots() {
             roomId: roomId || null
         }));
 
-        // Slide transition
-        const panel = document.getElementById('proposedSlots');
-        panel.style.display = 'block';
-        panel.style.transform = 'translateX(100%)';
-        setTimeout(() => { panel.style.transform = 'translateX(0)'; }, 20);
-
+        // Open right panel and render slots without changing modal height
+        openSlotsPanel();
         renderProposedSlots(slots);
         
     } catch (error) {
@@ -574,6 +584,7 @@ async function proposeSlots() {
 // Render proposed time slots
 function renderProposedSlots(slots) {
     const container = document.getElementById('slotsList');
+    if (!container) return;
     container.innerHTML = '';
     
     if (slots.length === 0) {
@@ -714,7 +725,7 @@ function setDefaultDate() {
 function refreshData() {
     refreshCurrentView();
     updateStats();
-    showNotification('Data refreshed', 'info');
+    // No notification popup on manual refresh (per UX request)
 }
 
 function refreshCurrentView() {
@@ -785,17 +796,23 @@ async function showAvailability() {
 }
 
 function renderRoomAvailability(room) {
-        // Build hour slots 10-18
-        const hours = Array.from({length:8}, (_,i)=> i+10);
-        let rows = '<div class="mb-2"><strong>'+room.roomName+'</strong></div><div class="d-flex flex-wrap">';
-        hours.forEach(h => {
-                const start = new Date(); start.setHours(h,0,0,0);
-                const end = new Date(); end.setHours(h+1,0,0,0);
-                const booked = room.bookings.some(b => (new Date(b.startUtc)) < end && (new Date(b.endUtc)) > start);
-                rows += `<div class="badge ${booked?'bg-danger':'bg-success'} me-2 mb-2" style="min-width:90px;">${h}:00-${h+1}:00 ${booked?'Booked':'Free'}</div>`;
-        });
-        rows += '</div><hr/>';
-        return rows;
+    // Build hour slots 10-18, hide past time blocks
+    const now = new Date();
+    const hours = Array.from({ length: 8 }, (_, i) => i + 10);
+    let items = [];
+    hours.forEach(h => {
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, 0, 0, 0);
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h + 1, 0, 0, 0);
+        // Skip slots that have entirely passed
+        if (end <= now) return;
+        const booked = (room.bookings || []).some(b => (new Date(b.startUtc)) < end && (new Date(b.endUtc)) > start);
+        items.push(`<div class="badge ${booked ? 'bg-danger' : 'bg-success'} me-2 mb-2" style="min-width:110px;">${String(h).padStart(2,'0')}:00-${String(h+1).padStart(2,'0')}:00 ${booked ? 'Booked' : 'Free'}</div>`);
+    });
+    const header = `<div class="mb-2"><strong>${room.roomName}</strong></div>`;
+    const body = items.length > 0
+        ? `<div class="d-flex flex-wrap">${items.join('')}</div>`
+        : `<div class="text-muted mb-2">No remaining slots today</div>`;
+    return header + body + '<hr/>';
 }
 
 function showLoading(show) {
