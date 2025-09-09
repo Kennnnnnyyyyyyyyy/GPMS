@@ -1,0 +1,10 @@
+@page
+@model Gate_Pass_management.Areas.Identity.Pages.Account.Manage.GenerateRecoveryCodesModel
+@{
+    ViewData["Title"] = "Generate recovery codes";
+}
+<h3>@ViewData["Title"]</h3>
+<p>Generating new recovery codes will invalidate any previously generated codes.</p>
+<form method="post">
+    <button type="submit" class="btn btn-warning">Generate new codes</button>
+</form>

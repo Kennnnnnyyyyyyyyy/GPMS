@@ -1,0 +1,21 @@
+@page
+@model Gate_Pass_management.Areas.Identity.Pages.Account.Manage.ShowRecoveryCodesModel
+@{
+    ViewData["Title"] = "Your recovery codes";
+}
+<h3>@ViewData["Title"]</h3>
+<p>Store these recovery codes in a safe place. You can use each code once.</p>
+@if (Model.RecoveryCodes?.Count > 0)
+{
+    <ul class="list-unstyled">
+        @foreach (var code in Model.RecoveryCodes)
+        {
+            <li><code>@code</code></li>
+        }
+    </ul>
+}
+else
+{
+    <p>No recovery codes available.</p>
+}
+<a asp-page="./TwoFactorAuthentication" class="btn btn-secondary">Back</a>

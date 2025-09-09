@@ -19,9 +19,8 @@
         </li>
         <li>
             <p>Scan the QR Code or enter this key <kbd>@Model.SharedKey</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
-            <div class="alert alert-info">Learn how to <a href="https://go.microsoft.com/fwlink/?Linkid=852423">enable QR Code generation</a>.</div>
             <div id="qrCode"></div>
-            <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
+            <div id="qrCodeData" data-url="@Model.AuthenticatorUri" hidden></div>
         </li>
         <li>
             <p>
@@ -47,15 +46,6 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    <script type="text/javascript">
-        window.addEventListener("load", () => {
-            const uri = document.getElementById("qrCodeData").getAttribute('data-url');
-            new QRious({
-                element: document.getElementById("qrCode"),
-                value: uri,
-                size: 150
-            });
-        });
-    </script>
+    <script src="~/lib/qrcode.min.js" asp-append-version="true"></script>
+    <script src="~/js/qr.js" asp-append-version="true"></script>
 }

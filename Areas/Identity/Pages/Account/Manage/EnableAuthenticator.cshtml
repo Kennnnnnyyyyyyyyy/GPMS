@@ -1,0 +1,28 @@
+@page
+@model Gate_Pass_management.Areas.Identity.Pages.Account.Manage.EnableAuthenticatorModel
+@{
+    ViewData["Title"] = "Enable authenticator app";
+}
+<h3>@ViewData["Title"]</h3>
+<p>Use an authenticator app to scan the QR code or enter the key manually.</p>
+<div class="mb-3">
+    <strong>Shared Key:</strong>
+    <div class="text-monospace">@Model.SharedKey</div>
+</div>
+<div class="mb-3">
+  <div id="qrCode"></div>
+  <span id="qrCodeData" data-url="@Model.AuthenticatorUri" hidden></span>
+</div>
+<form method="post">
+    <div class="mb-3">
+        <label for="Code" class="form-label">Verification code</label>
+        <input id="Code" name="Code" class="form-control" autocomplete="one-time-code" />
+    </div>
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/lib/qrcode.min.js" asp-append-version="true"></script>
+    <script src="~/js/qr.js" asp-append-version="true"></script>
+}
