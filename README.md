@@ -82,7 +82,3 @@ With advanced features such as **admin/employee authentication, two-factor secur
 ![OD Management 1](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.48%E2%80%AFPM.png?raw=true)
 ![OD Management 2](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.01%E2%80%AFPM.png?raw=true)
 ![OD Management 3](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.28%E2%80%AFPM.png?raw=true)
-
-
-
-# Thanks For Visiting !!!
