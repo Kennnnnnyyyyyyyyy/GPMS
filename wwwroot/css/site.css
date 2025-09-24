@@ -458,32 +458,53 @@ footer {
   background-attachment: local;
   transition: left 0.3s ease;
   z-index: 1050;
-  overflow-y: auto;
+  /* Sidebar itself should not scroll; content area will scroll */
+  overflow-y: hidden;
   overflow-x: hidden;
+  position: fixed; /* ensure positioned ancestor for absolute footer */
 }
 
 /* Make sidebar a column layout so footer can stick to bottom */
 .sidebar {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .sidebar-content {
   flex: 1 1 auto;
-  overflow-y: auto;
+  overflow-y: auto;           /* scroll only this section */
+  padding: 0 0.5rem;          /* keep existing side padding */
+  padding-bottom: calc(64px + env(safe-area-inset-bottom)); /* ensure last items not hidden behind footer incl. iOS safe area */
 }
 
 .sidebar-footer {
   flex: 0 0 auto;
-  margin-top: auto; /* push to absolute bottom */
-  padding: 0.75rem 0.75rem 1rem 0.75rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.15));
+  margin-top: auto; /* push to bottom in flex flow */
+  padding: 0.5rem 0.75rem;      /* compact footer padding */
+  height: 56px;                 /* fixed height for layout math */
+  border-top: 0 !important;     /* remove any divider */
+  background: transparent;      /* remove white/grey overlay */
+  position: absolute;           /* hard anchor to bottom of sidebar */
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  z-index: 2; /* keep above hovered list backgrounds */
 }
 
 .sidebar-footer .logout-link {
-  background: transparent;
-  border: none;
+  /* reset native and framework button styles */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
   color: rgba(255,255,255,0.95);
   padding: 0.75rem 1.25rem;
   margin: 0.25rem 0;
@@ -544,9 +565,10 @@ footer {
   margin-bottom: 1rem;
 }
 
-.sidebar-content {
-  padding: 0 0.5rem;
-}
+/* Remove mobile tap highlight inside the sidebar (iOS Safari) */
+.sidebar, .sidebar * { -webkit-tap-highlight-color: transparent; }
+
+/* moved padding to the earlier .sidebar-content rule to also include bottom padding */
 
 .sidebar .nav-link {
   color: rgba(255, 255, 255, 0.9);
@@ -560,8 +582,9 @@ footer {
   position: relative;
 }
 
+/* Remove white/gray hover overlay for sidebar links */
 .sidebar .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent !important;
   color: #fff;
   transform: translateX(5px);
 }
@@ -600,8 +623,9 @@ footer {
   font-size: 0.9rem;
 }
 
+/* Remove white/gray hover overlay for submenu links */
 .submenu-link:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent !important;
   color: #fff;
   transform: translateX(3px);
 }
