@@ -91,18 +91,29 @@
                            asp-controller="Room" asp-action="Index">
                             <i class="bi bi-door-open"></i>
                             <span>Rooms</span>
-                            <li>
-                                <form class="dropdown-item" asp-controller="Account" asp-action="Logout" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-link text-decoration-none p-0 text-dark">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
+                        </a>
+                    </li>
+
+                    <!-- Sidebar Logout (admin visible) -->
+                    <li class="nav-item">
+                        <form class="nav-link p-0" asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link w-100 text-start text-decoration-none">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </li>
+                    
+                    <!-- Meeting Scheduler (also shown below for non-admin roles) -->
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Scheduler" ? "active" : "")"
+                           asp-controller="Scheduler" asp-action="Index">
+                            <i class="bi bi-calendar-event"></i>
                             <span>Meeting Scheduler</span>
                         </a>
                     </li>
-                    
+
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" 
                            asp-controller="Admin" asp-action="Dashboard">
@@ -116,6 +127,17 @@
                            asp-controller="Sms" asp-action="Index">
                             <i class="bi bi-chat-dots"></i>
                             <span>SMS</span>
+                        </a>
+                    </li>
+                }
+                else if ((User?.IsInRole("Reception") == true) || (User?.IsInRole("Employee") == true))
+                {
+                    <!-- Meeting Scheduler for non-admin roles allowed by controller -->
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Scheduler" ? "active" : "")"
+                           asp-controller="Scheduler" asp-action="Index">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Meeting Scheduler</span>
                         </a>
                     </li>
                 }
