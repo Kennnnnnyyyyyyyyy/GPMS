@@ -74,12 +74,12 @@ With advanced features such as **admin/employee authentication, two-factor secur
 
 ## Screenshots
 
-### Visitor Entry
+
 ![Visitor Entry 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.08PM.png)
 ![Visitor Entry 2](gpms_pictures/Screenshot%202025-09-24%20at%203.54.23PM.png)
 ![Visitor Entry 3](gpms_pictures/Screenshot%202025-09-24%20at%203.54.38PM.png)
 
-### Local OD Management
+
 ![OD Management 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.48PM.png)
 ![OD Management 2](gpms_pictures/Screenshot%202025-09-24%20at%203.55.01PM.png)
 ![OD Management 3](gpms_pictures/Screenshot%202025-09-24%20at%203.55.28PM.png)
