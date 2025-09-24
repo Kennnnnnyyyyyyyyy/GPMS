@@ -82,12 +82,4 @@ The **Gate Pass Management System** is a web-based application developed to effi
 
 Contributions are welcome! Please fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
 
-## 🙌 Acknowledgments
-
-- **Guide**: Mr. Kiran Chougule, Asst. General Manager-IT, Ashoka Buildcon Limited
-- **Project by**: Rohan Rahul Takmoge
-- 
-## 📬 Contact  
-Feel free to reach out via [LinkedIn](https://www.linkedin.com/in/rohan-takmoge-141b52251/) or [Email](mailto:rohantakmoge19@gmail.com).
-
 # 🙏🏻 Thanks For Visiting !!!
