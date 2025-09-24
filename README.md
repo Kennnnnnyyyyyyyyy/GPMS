@@ -47,19 +47,47 @@ The **Gate Pass Management System** is a web-based application developed to effi
    - Build the solution.
    - Run the application.
 
+## 🔐 Login Credentials
+
+### Default System Users
+The system comes with pre-configured accounts for immediate testing:
+
+| Role | Username | Password | Access Level |
+|------|----------|----------|--------------|
+| **Administrator** | `admin` | `Admin@123` | Full system access |
+| **Employee** | `employee` | `Employee@123` | Scheduler & basic operations |
+
+### Login URLs
+- **Standard Login**: `/Account/Login` (all users)
+- **Admin Login**: `/Account/AdminLogin` (admin only)
+
+⚠️ **Security Note**: Change default passwords before production use!
+
+📖 **Detailed Guide**: See [LOGIN.md](LOGIN.md) for complete authentication documentation.
+
 ## 💻 Usage
 
-1. **Visitor Entry**
+1. **System Login**
+   - Access the application at the root URL
+   - Use credentials from the table above
+   - Complete 2FA setup if prompted (required for admin)
+
+2. **Visitor Management**
+   - **Registration**: Public form at `/Intake` (QR code accessible)
+   - **Approval**: Admin dashboard at `/VisitorApproval`
+   - **Gate Scanning**: Security interface at `/GateScan`
+
+3. **Visitor Entry** (Legacy)
    - Navigate to the Visitor Entry section.
    - Fill in the visitor's details, including name, mobile number, company, and purpose of visit.
    - Record entry and exit times, as well as vehicle details.
 
-2. **Local OD Management**
+4. **Local OD Management**
    - Access the Local OD section.
    - Employees can apply for out-duty by providing details such as the visit location, purpose, and time.
    - Track the time of departure and return.
 
-3. **Exporting Data**
+5. **Exporting Data**
    - Export visitor and Local OD data to Excel for reporting purposes using the Export to Excel functionality.
 
 ## 📸 Screenshots
