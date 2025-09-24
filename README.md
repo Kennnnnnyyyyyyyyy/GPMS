@@ -74,15 +74,14 @@ With advanced features such as **admin/employee authentication, two-factor secur
 
 ## Screenshots
 
+### Visitor Entry
+![Visitor Entry 1](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.08%E2%80%AFPM.png?raw=true)
+![Visitor Entry 2](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.23%E2%80%AFPM.png?raw=true)
+![Visitor Entry 3](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.38%E2%80%AFPM.png?raw=true)
 
-![Visitor Entry 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.08PM.png)
-![Visitor Entry 2](gpms_pictures/Screenshot%202025-09-24%20at%203.54.23PM.png)
-![Visitor Entry 3](gpms_pictures/Screenshot%202025-09-24%20at%203.54.38PM.png)
-
-
-![OD Management 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.48PM.png)
-![OD Management 2](gpms_pictures/Screenshot%202025-09-24%20at%203.55.01PM.png)
-![OD Management 3](gpms_pictures/Screenshot%202025-09-24%20at%203.55.28PM.png)
+![OD Management 1](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.48%E2%80%AFPM.png?raw=true)
+![OD Management 2](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.01%E2%80%AFPM.png?raw=true)
+![OD Management 3](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.28%E2%80%AFPM.png?raw=true)
 
 
 
