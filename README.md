@@ -1,18 +1,38 @@
 
-# 🚪 Gate Pass Management System
+# Gate Pass Management System
+## Overview
 
-## 📦 Overview
+The **Gate Pass Management System (GPMS)** is a secure, web-based application developed to efficiently manage the entries and exits of visitors and employees within an organization.  
+This system automates the gate pass issuance process, tracks visitor and employee movements, and generates comprehensive reports, making it an essential tool for organizational security and visitor management.  
 
-The **Gate Pass Management System** is a web-based application developed to efficiently manage the entries and exits of visitors and employees within an organization. This system automates the gate pass issuance process, tracks visitor and employee movements, and generates comprehensive reports, making it an essential tool for organizational security and visitor management.
+With advanced features such as **admin/employee authentication, two-factor security, meeting scheduling, and a powerful admin dashboard**, GPMS not only strengthens access control but also enhances the overall efficiency of organizational workflows.
 
-## ✨ Features
+---
 
-- **Visitor Entry Management**: Record and manage the details of visitors, including their name, company, purpose of visit, entry and exit times, and vehicle information.
-- **Local OD (Official Duty) Management**: Allows employees to apply for out-duty (OD) passes, specifying the visit location, purpose, and time of departure and return.
-- **Data Export**: Export visitor and OD records to Excel for further analysis and reporting.
-- **Real-time Monitoring**: Track the current status of visitors and employees within the organization.
-- **User-friendly Interface**: Intuitive design with easy navigation, ensuring a seamless user experience.
+## Features
 
+### Authentication & Security
+- **Admin & Employee Sign In / Sign Up** – Dedicated authentication system for different roles with secure registration and login.  
+- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.  
+
+### Visitor Management
+- **Visitor Entry & Registration** – Record visitor details including name, company, purpose of visit, entry/exit times, and vehicle information.  
+- **Gate Pass Automation** – Simplifies issuance and tracking of visitor passes.  
+- **Entry & Exit Tracking** – Real-time updates of all visitor movements.  
+
+### Employee Tools
+- **Local OD (Official Duty) Management** – Employees can apply for out-duty passes, specifying visit details, departure, and return times.  
+- **Meeting Scheduler** – Schedule and manage meetings with employees and visitors seamlessly.  
+
+### Administrative Control
+- **Admin Dashboard** – Centralized monitoring hub for visitor logs, OD requests, meetings, and overall activity.  
+- **Data Export** – Export visitor, OD, and meeting records to Excel for reporting and analysis.  
+- **Real-time Monitoring & Updates** – Continuously updated dashboards showing active visitors, employees, and system activities.  
+
+### User Experience
+- **User-friendly Interface** – Clean and intuitive design for both admins and employees.  
+- **Seamless Workflow** – Optimized for speed, accuracy, and ease of use across all devices.
+- 
 ## 🛠️ Technologies Used
 
 - **Backend**: ASP.NET MVC Framework, Entity Framework Core
@@ -20,66 +40,50 @@ The **Gate Pass Management System** is a web-based application developed to effi
 - **Database**: Microsoft SQL Server
 - **Other Libraries**: EPPlus for Excel export functionality
 
-## 🚀 Installation
+## Usage
 
-### Prerequisites
+### Authentication & Security
+- **Admin / Employee Sign In & Sign Up**  
+  Secure login and registration for both employees and administrators.  
+- **Two-Factor Authentication (2FA)**  
+  Adds an extra layer of security using OTP verification.  
 
-- .NET Core SDK 5.0 or higher
-- Microsoft SQL Server 2017 or higher
-- Visual Studio 2019 or higher (or Visual Studio Code)
-- Basic knowledge of C#, ASP.NET Core, HTML, CSS, JavaScript, and SQL
+###  Visitor Management
+- **Visitor Registration System**  
+  Record visitor details including name, company, purpose of visit, and contact information.  
+- **Entry & Exit Tracking**  
+  Log visitor check-ins and check-outs along with vehicle details.  
 
-### Steps
+###  Employee Tools
+- **Local OD (Official Duty) Management**  
+  Employees can apply for out-duty passes, providing location, purpose, departure, and return times.  
+- **Meeting Scheduler**  
+  Schedule, manage, and track meetings with visitors or employees.  
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/rohan-takmoge/Gate-Pass-management-System.git
-   cd Gate-Pass-management-System
-   ```
+### Admin Dashboard
+- **Centralized Monitoring**  
+  Admins can view visitor statistics, OD requests, meeting schedules, and system activity in one place.  
+- **Data Export**  
+  Export visitor logs, OD records, and meeting schedules to Excel for reports and audits.  
+- **Real-time Monitoring**  
+  Track ongoing visits and active employees within the premises.  
 
-2. **Set Up the Database**
-   - Create a new database in SQL Server.
-   - Update the connection string in `appsettings.json` with your SQL Server details.
+### User Experience
+- **User-friendly Interface**  
+  Clean, intuitive design with easy navigation for both employees and administrators.  
 
-3. **Build and Run the Application**
-   - Open the solution in Visual Studio.
-   - Restore the NuGet packages.
-   - Build the solution.
-   - Run the application.
-
-## 💻 Usage
-
-1. **Visitor Entry**
-   - Navigate to the Visitor Entry section.
-   - Fill in the visitor's details, including name, mobile number, company, and purpose of visit.
-   - Record entry and exit times, as well as vehicle details.
-
-2. **Local OD Management**
-   - Access the Local OD section.
-   - Employees can apply for out-duty by providing details such as the visit location, purpose, and time.
-   - Track the time of departure and return.
-
-3. **Exporting Data**
-   - Export visitor and Local OD data to Excel for reporting purposes using the Export to Excel functionality.
-
-## 📸 Screenshots
-![Screenshot (39)](https://github.com/user-attachments/assets/bc93cabf-88f5-4a8a-852a-b9eacaa20d94)
+## Screenshots
 
 ### Visitor Entry
-
-![Screenshot (43)](https://github.com/user-attachments/assets/df93a96a-36ed-4f9d-a6f6-fe44644191c0)
-![Screenshot (44)](https://github.com/user-attachments/assets/dcb02b8b-1a67-40aa-9281-3560628cda90)
-![Screenshot (45)](https://github.com/user-attachments/assets/0926dce8-9893-426d-9453-8017bc05271d)
-
+![Visitor Entry 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.08PM.png)
+![Visitor Entry 2](gpms_pictures/Screenshot%202025-09-24%20at%203.54.23PM.png)
+![Visitor Entry 3](gpms_pictures/Screenshot%202025-09-24%20at%203.54.38PM.png)
 
 ### Local OD Management
+![OD Management 1](gpms_pictures/Screenshot%202025-09-24%20at%203.54.48PM.png)
+![OD Management 2](gpms_pictures/Screenshot%202025-09-24%20at%203.55.01PM.png)
+![OD Management 3](gpms_pictures/Screenshot%202025-09-24%20at%203.55.28PM.png)
 
-![Screenshot (40)](https://github.com/user-attachments/assets/a68fde0d-4816-4e28-9c76-f55da27c08b4)
-![Screenshot (41)](https://github.com/user-attachments/assets/7688c5dc-5a76-4e07-87d3-a887707bc8d9)
-![Screenshot (42)](https://github.com/user-attachments/assets/2942917a-de9c-403a-a8ab-df761de7a30e)
 
-## 🤝 Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
-
-# 🙏🏻 Thanks For Visiting !!!
+# Thanks For Visiting !!!
