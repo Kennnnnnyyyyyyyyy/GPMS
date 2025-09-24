@@ -462,6 +462,57 @@ footer {
   overflow-x: hidden;
 }
 
+/* Make sidebar a column layout so footer can stick to bottom */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  flex: 0 0 auto;
+  margin-top: auto; /* push to absolute bottom */
+  padding: 0.75rem 0.75rem 1rem 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.15));
+}
+
+.sidebar-footer .logout-link {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.95);
+  padding: 0.75rem 1.25rem;
+  margin: 0.25rem 0;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Remove white overlay/highlight */
+.sidebar-footer .logout-link:hover,
+.sidebar-footer .logout-link:focus,
+.sidebar-footer .logout-link:active {
+  background: transparent !important;
+  color: #fff;
+  outline: none;
+  box-shadow: none;
+}
+
+.sidebar-footer .logout-link i {
+  width: 20px;
+  margin-right: 0.75rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
 .sidebar.active {
   left: 0;
 }

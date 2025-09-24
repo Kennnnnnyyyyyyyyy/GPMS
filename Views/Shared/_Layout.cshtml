@@ -94,16 +94,7 @@
                         </a>
                     </li>
 
-                    <!-- Sidebar Logout (admin visible) -->
-                    <li class="nav-item">
-                        <form class="nav-link p-0" asp-controller="Account" asp-action="Logout" method="post">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-link w-100 text-start text-decoration-none">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Logout</span>
-                            </button>
-                        </form>
-                    </li>
+                    
                     
                     <!-- Meeting Scheduler (also shown below for non-admin roles) -->
                     <li class="nav-item">
@@ -221,6 +212,18 @@
                 </li>
             </ul>
         </div>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <div class="sidebar-footer">
+                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-link w-100 text-start">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
+        }
     </div>
 
     <!-- Main Content -->
