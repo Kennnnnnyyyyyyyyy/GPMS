@@ -1,5 +1,5 @@
 
-# GatePass Management System
+# Gate Pass Management System
 ## Overview
 
 The **Gate Pass Management System (GPMS)** is a secure, web-based application developed to efficiently manage the entries and exits of visitors and employees within an organization.  
