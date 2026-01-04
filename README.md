@@ -5,7 +5,7 @@
 The **Gate Pass Management System (GPMS)** is a secure, web-based application developed to efficiently manage the entries and exits of visitors and employees within an organization.  
 This system automates the gate pass issuance process, tracks visitor and employee movements, and generates comprehensive reports, making it an essential tool for organizational security and visitor management.  
 
-With advanced features such as **admin/employee authentication, two-factor security, meeting scheduling, and a powerful admin dashboard**, GPMS not only strengthens access control but also enhances the overall efficiency of organizational workflows.
+With advanced features such as **admin/employee authentication, two-factor security, meeting scheduling, and a powerful admin dashboard**, GPMS not only strengthens access control but also enhances the overall efficiency of organizational workflows and real-time automation.
 
 ---
 
