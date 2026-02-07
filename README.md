@@ -8,7 +8,7 @@ This system automates the gate pass issuance process, tracks visitor and employe
 With advanced features such as **admin/employee authentication, two-factor security, meeting scheduling, and a powerful admin dashboard**, GPMS not only strengthens access control but also enhances the overall efficiency of organizational workflows and real-time automation.
 
 <p align="center">
-  <img src="gpms_pictures/Splash" width="300" alt="Splash screen" />
+  <img src="gpms_pictures/Splash.png" width="80%" alt="Gate Pass Management System overview" />
 </p>
 
 ---
