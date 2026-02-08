@@ -21,11 +21,12 @@ With advanced features such as **admin/employee authentication, two-factor secur
   <p align="center">
   <img src="gpms_pictures/SignIn.png" width="80%" alt="Sign in screen" />
 </p>
+
+- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.
+  
   <p align="center">
   <img src="gpms_pictures/2FA.png" width="80%" alt="Two factor authentication" />
 </p>
-- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.
-
 
 
 ### Visitor Management
