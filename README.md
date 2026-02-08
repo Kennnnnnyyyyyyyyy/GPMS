@@ -97,13 +97,8 @@ With advanced features such as **admin/employee authentication, two-factor secur
 - **User-friendly Interface**  
   Clean, intuitive design with easy navigation for both employees and administrators.  
 
-## Screenshots
+## LICENSE
 
-### Visitor Entry
-![Visitor Entry 1](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.08%E2%80%AFPM.png?raw=true)
-![Visitor Entry 2](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.23%E2%80%AFPM.png?raw=true)
-![Visitor Entry 3](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.38%E2%80%AFPM.png?raw=true)
+MIT License © 2026 Kenny  
+See the [LICENSE](LICENSE) file for details.
 
-![OD Management 1](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.54.48%E2%80%AFPM.png?raw=true)
-![OD Management 2](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.01%E2%80%AFPM.png?raw=true)
-![OD Management 3](https://github.com/Kennnnnnyyyyyyyyy/GPMS/blob/main/gpms_pictures/Screenshot%202025-09-24%20at%203.55.28%E2%80%AFPM.png?raw=true)
