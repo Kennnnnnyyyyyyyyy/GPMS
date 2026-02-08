@@ -34,7 +34,7 @@ With advanced features such as **admin/employee authentication, two-factor secur
 - **Gate Pass Automation** – Simplifies issuance and tracking of visitor passes. - **Entry & Exit Tracking** – Real-time updates of all visitor movements.  
 
 <p align="center">
-  <img src="gpms_pictures/Registration.png" width="320" alt="User registration screen" />
+  <img src="gpms_pictures/Registration.png" width="80%" alt="User registration screen" />
 </p>
 
 ### Employee Tools
