@@ -58,7 +58,7 @@ With advanced features such as **admin/employee authentication, two-factor secur
 - **User-friendly Interface** – Clean and intuitive design for both admins and employees.  
 - **Seamless Workflow** – Optimized for speed, accuracy, and ease of use across all devices.
 - 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Backend**: ASP.NET MVC Framework, Entity Framework Core
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap
