@@ -16,12 +16,17 @@ With advanced features such as **admin/employee authentication, two-factor secur
 ## Features
 
 ### Authentication & Security
-- **Admin & Employee Sign In / Sign Up** – Dedicated authentication system for different roles with secure registration and login.  
-- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.
+- **Admin & Employee Sign In / Sign Up** – Dedicated authentication system for different roles with secure registration and login.
 
   <p align="center">
   <img src="gpms_pictures/SignIn.png" width="80%" alt="Sign in screen" />
 </p>
+  <p align="center">
+  <img src="gpms_pictures/2FA.png" width="80%" alt="Two factor authentication" />
+</p>
+- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.
+
+
 
 ### Visitor Management
 - **Visitor Entry & Registration** – Record visitor details including name, company, purpose of visit, entry/exit times, and vehicle information.  
