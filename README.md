@@ -17,21 +17,36 @@ With advanced features such as **admin/employee authentication, two-factor secur
 
 ### Authentication & Security
 - **Admin & Employee Sign In / Sign Up** – Dedicated authentication system for different roles with secure registration and login.  
-- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.  
+- **Two-Factor Authentication (2FA)** – Adds an extra layer of protection with OTP-based verification.
+
+  <p align="center">
+  <img src="gpms_pictures/SignIn.png" width="320" alt="Sign in screen" />
+</p>
 
 ### Visitor Management
 - **Visitor Entry & Registration** – Record visitor details including name, company, purpose of visit, entry/exit times, and vehicle information.  
-- **Gate Pass Automation** – Simplifies issuance and tracking of visitor passes.  
-- **Entry & Exit Tracking** – Real-time updates of all visitor movements.  
+- **Gate Pass Automation** – Simplifies issuance and tracking of visitor passes. - **Entry & Exit Tracking** – Real-time updates of all visitor movements.  
+
+<p align="center">
+  <img src="gpms_pictures/Registration.png" width="320" alt="User registration screen" />
+</p>
 
 ### Employee Tools
 - **Local OD (Official Duty) Management** – Employees can apply for out-duty passes, specifying visit details, departure, and return times.  
-- **Meeting Scheduler** – Schedule and manage meetings with employees and visitors seamlessly.  
+- **Meeting Scheduler** – Schedule and manage meetings with employees and visitors seamlessly.
+
+<p align="center">
+  <img src="gpms_pictures/MeetingSchedular.png" width="80%" alt="Meeting scheduler" />
+</p>
 
 ### Administrative Control
 - **Admin Dashboard** – Centralized monitoring hub for visitor logs, OD requests, meetings, and overall activity.  
 - **Data Export** – Export visitor, OD, and meeting records to Excel for reporting and analysis.  
-- **Real-time Monitoring & Updates** – Continuously updated dashboards showing active visitors, employees, and system activities.  
+- **Real-time Monitoring & Updates** – Continuously updated dashboards showing active visitors, employees, and system activities.
+
+<p align="center">
+  <img src="gpms_pictures/AdminPage.png" width="80%" alt="Admin dashboard" />
+</p>
 
 ### User Experience
 - **User-friendly Interface** – Clean and intuitive design for both admins and employees.  
